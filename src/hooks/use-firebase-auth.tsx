@@ -5,6 +5,8 @@ import {
   firebaseEmailSignup,
 } from "@/lib/firebase/auth/auth-with-email";
 import {
+  firebaseFacebookSignin,
+  firebaseGithubSignin,
   firebaseGoogleSignin,
   firebaseMicrosoftSignin,
 } from "@/lib/firebase/auth/auth-with-provider";
@@ -61,6 +63,10 @@ export function useFirebaseAuth() {
 
   const onFirebaseGoogleSignin = () => handleOAuth(firebaseGoogleSignin);
 
+  const onFirebaseFacebookSignin = () => handleOAuth(firebaseFacebookSignin);
+
+  const onFirebaseGithubSignin = () => handleOAuth(firebaseGithubSignin);
+
   const onFIrebaserMicrosoftSignin = () => handleOAuth(firebaseMicrosoftSignin);
 
   return {
@@ -70,5 +76,7 @@ export function useFirebaseAuth() {
     onFirebaseEmailSignin,
     onFirebaseGoogleSignin,
     onFIrebaserMicrosoftSignin,
+    onFirebaseFacebookSignin,
+    onFirebaseGithubSignin,
   };
 }
