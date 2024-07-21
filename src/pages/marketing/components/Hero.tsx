@@ -38,8 +38,8 @@ export const Hero = () => {
         </p>
 
         <div className="space-y-4 md:space-y-0 md:space-x-4">
-          <Button className="w-full md:w-1/3 font-bold">
-            <Link to={isAuthenticated ? MAIN_PATHES.MAIN : AUTH_PATHES.SIGNUP}>
+          <Link to={isAuthenticated ? MAIN_PATHES.MAIN : AUTH_PATHES.SIGNUP}>
+            <Button className="w-full md:w-1/3 font-bold">
               {typeof isAuthenticated !== "boolean" ? (
                 <div className="animate-spin text-xs">
                   <FiLoader size={18} />
@@ -49,10 +49,10 @@ export const Hero = () => {
               ) : (
                 "Get Started"
               )}
-            </Link>
-            &ensp;
-            <FaArrowRight />
-          </Button>
+              &ensp;
+              <FaArrowRight />
+            </Button>
+          </Link>
         </div>
       </div>
       <div className="hidden xl:flex flex-row flex-wrap gap-8 relative w-[700px] h-[500px]">
