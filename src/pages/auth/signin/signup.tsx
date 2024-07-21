@@ -3,7 +3,7 @@ import { SignupForm } from "./components/signup-form";
 
 export function SignupPage() {
   return (
-    <AuthLayout>
+    <AuthLayout bgImage="/auth-illustration.svg">
       <SignupForm />
     </AuthLayout>
   );

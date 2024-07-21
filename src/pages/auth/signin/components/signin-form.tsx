@@ -91,27 +91,27 @@ export function SigninForm() {
         <div className="flex justify-between items-center gap-2 mt-4">
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full p-4"
             onClick={() => onOAuthSignup("google")}
             disabled={isPending}
           >
-            <FaGoogle size={18} />
+            <FaGoogle size={20} />
           </Button>
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full p-4"
             onClick={() => onOAuthSignup("facebook")}
             disabled={isPending}
           >
-            <FaFacebook size={18} />
+            <FaFacebook size={20} />
           </Button>
           <Button
             variant="outline"
-            className="w-full"
+            className="w-full p-4"
             onClick={() => onOAuthSignup("github")}
             disabled={isPending}
           >
-            <FaGithub size={18} />
+            <FaGithub size={20} />
           </Button>
         </div>
         <div className="flex items-center justify-center space-x-2 mt-4">
@@ -151,7 +151,7 @@ export function SigninForm() {
               />
               <Link
                 to={AUTH_PATHES.FORGET_PASSWORD}
-                className="text-sm underline text-right"
+                className="text-xs underline text-right"
               >
                 Forgot your password?
               </Link>

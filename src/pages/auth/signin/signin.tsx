@@ -3,7 +3,7 @@ import { SigninForm } from "./components/signin-form";
 
 export function SigninPage() {
   return (
-    <AuthLayout>
+    <AuthLayout bgImage="/auth-illustration.svg">
       <SigninForm />
     </AuthLayout>
   );
