@@ -36,7 +36,7 @@ export const Navbar = () => {
           {/* desktop */}
           <div className="flex gap-2">
             <Link
-              to={isAuthenticated ? MAIN_PATHES.DASHBOARD : AUTH_PATHES.SIGNIN}
+              to={isAuthenticated ? MAIN_PATHES.MAIN : AUTH_PATHES.SIGNIN}
               className={`border ${buttonVariants({
                 variant: "secondary",
               })}`}

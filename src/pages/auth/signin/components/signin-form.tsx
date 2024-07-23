@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FaGithub, FaGoogle, FaFacebook } from "react-icons/fa";
 
 import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 
@@ -10,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ErrorAlert } from "@/components/error-alert";
+
+import { OauthSection } from "./oauth-section";
 
 import { AUTH_PATHES } from "@/routes/auth.routes";
 
@@ -87,33 +88,8 @@ export function SigninForm() {
         {error && <ErrorAlert title="Sign In failed" description={error} />}
       </CardHeader>
 
-      <CardContent>
-        <div className="flex justify-between items-center gap-2 mt-4">
-          <Button
-            variant="outline"
-            className="w-full p-4"
-            onClick={() => onOAuthSignup("google")}
-            disabled={isPending}
-          >
-            <FaGoogle size={20} />
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full p-4"
-            onClick={() => onOAuthSignup("facebook")}
-            disabled={isPending}
-          >
-            <FaFacebook size={20} />
-          </Button>
-          <Button
-            variant="outline"
-            className="w-full p-4"
-            onClick={() => onOAuthSignup("github")}
-            disabled={isPending}
-          >
-            <FaGithub size={20} />
-          </Button>
-        </div>
+      <CardContent className="space-y-6">
+        <OauthSection onOAuthSignup={onOAuthSignup} isPending={isPending} />
         <div className="flex items-center justify-center space-x-2 mt-4">
           <Separator orientation="horizontal" className="flex-1" />
           <p className="text-xs text-muted-foreground">OR CONTINUE WITH</p>
@@ -135,7 +111,7 @@ export function SigninForm() {
               <p className="text-red-500 text-sm">{errors.email.message}</p>
             )}
           </div>
-          <form onSubmit={handleSubmit(onEmailSignin)}>
+          <form onSubmit={handleSubmit(onEmailSignin)} className="space-y-6">
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password*</Label>

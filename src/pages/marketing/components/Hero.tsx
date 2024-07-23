@@ -45,7 +45,7 @@ export const Hero = () => {
                   <FiLoader size={18} />
                 </div>
               ) : isAuthenticated ? (
-                "Enter The Chat"
+                "Start new chat"
               ) : (
                 "Get Started"
               )}
