@@ -1,8 +1,10 @@
 import { useState } from "react";
 
 import {
+  firebaseConfirmPasswordReset,
   firebaseEmailSignin,
   firebaseEmailSignup,
+  firebasePasswordResetEmail,
 } from "@/lib/firebase/auth/auth-with-email";
 import {
   firebaseFacebookSignin,
@@ -40,10 +42,12 @@ export function useFirebaseAuth() {
   };
 
   const handleOAuth = async (onAuth: ProviderAuthFunction) => {
+    setIsPending(true);
     const data = await onAuth();
     if (data.error) {
       setError(data.detail as string);
     }
+    setIsPending(false);
     return data;
   };
 
@@ -69,6 +73,29 @@ export function useFirebaseAuth() {
 
   const onFIrebaserMicrosoftSignin = () => handleOAuth(firebaseMicrosoftSignin);
 
+  const onFirebasePasswordResetEmail = async (email: string) => {
+    setIsPending(true);
+    const data = await firebasePasswordResetEmail(email);
+    if (data.error) {
+      setError(data.detail as string);
+    }
+    setIsPending(false);
+    return data;
+  };
+
+  const onFirebaseConfirmPasswordReset = async (
+    oobCode: string,
+    newPassword: string
+  ) => {
+    setIsPending(true);
+    const data = await firebaseConfirmPasswordReset(oobCode, newPassword);
+    if (data.error) {
+      setError(data.detail as string);
+    }
+    setIsPending(false);
+    return data;
+  };
+
   return {
     isPending,
     error,
@@ -78,5 +105,8 @@ export function useFirebaseAuth() {
     onFIrebaserMicrosoftSignin,
     onFirebaseFacebookSignin,
     onFirebaseGithubSignin,
+    firebasePasswordResetEmail,
+    onFirebasePasswordResetEmail,
+    onFirebaseConfirmPasswordReset,
   };
 }

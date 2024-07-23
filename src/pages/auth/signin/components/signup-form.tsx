@@ -10,20 +10,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { ErrorAlert } from "@/components/error-alert";
-
-import { AUTH_PATHES } from "@/routes/auth.routes";
-
-import { signupSchemaType, signupSchema } from "@/schemas/auth";
-import { deleteFirebaseCurrentUser } from "@/lib/firebase/auth/auth-with-email";
-import { UserCredential } from "firebase/auth";
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+
+import { AUTH_PATHES } from "@/routes/auth.routes";
+
+import { UserCredential } from "firebase/auth";
+
+import { deleteFirebaseCurrentUser } from "@/lib/firebase/auth/auth-with-email";
+
+import { signupSchemaType, signupSchema } from "@/schemas/auth";
 
 export function SignupForm() {
+  const { toast } = useToast();
+
   const {
     isPending,
     error,
@@ -56,6 +61,9 @@ export function SignupForm() {
       //   lastName: lastName.trim().toLowerCase(),
       //   email: email.trim().toLowerCase(),
       // });
+      return toast({
+        description: "Verification email sent to Your Inbox!",
+      });
     } catch (err) {
       deleteFirebaseCurrentUser(); // Remove the current user from Firebase in case registration fails in the database
       console.error("Signup failed", err);
@@ -91,8 +99,8 @@ export function SignupForm() {
       <CardHeader className="grid gap-2">
         <h1 className="text-3xl font-bold">Sign Up</h1>
         <p className="text-balance text-muted-foreground">Create new account</p>
+        {error && <ErrorAlert title="Sign In failed" description={error} />}
       </CardHeader>
-      {error && <ErrorAlert title="Sign In failed" description={error} />}
 
       <CardContent>
         <div className="flex justify-between items-center gap-2 mt-4">

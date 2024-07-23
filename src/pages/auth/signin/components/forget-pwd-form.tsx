@@ -1,20 +1,25 @@
-import { Label } from "@radix-ui/react-label";
-import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FaArrowLeft } from "react-icons/fa";
 
 import { useFirebaseAuth } from "@/hooks/use-firebase-auth";
 
-import { ErrorAlert } from "@/components/error-alert";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { resetPwdSchema, resetPwdSchemaType } from "@/schemas/auth";
 import { Button } from "@/components/ui/button";
-import { FaArrowLeft } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { useToast } from "@/components/ui/use-toast";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { ErrorAlert } from "@/components/error-alert";
+
+import { resetPwdSchema, resetPwdSchemaType } from "@/schemas/auth";
+
 import { AUTH_PATHES } from "@/routes/auth.routes";
 
 export function ForgetPwdForm() {
-  const { isPending, error } = useFirebaseAuth();
+  const { isPending, error, onFirebasePasswordResetEmail } = useFirebaseAuth();
+
+  const { toast } = useToast();
 
   const {
     register,
@@ -24,8 +29,13 @@ export function ForgetPwdForm() {
     resolver: zodResolver(resetPwdSchema),
   });
 
-  const onSendResetEmail = async () => {
-    return;
+  const onSendResetEmail: SubmitHandler<resetPwdSchemaType> = async ({
+    email,
+  }) => {
+    const res = await onFirebasePasswordResetEmail(email);
+    return toast({
+      description: res.detail,
+    });
   };
 
   return (
@@ -39,8 +49,8 @@ export function ForgetPwdForm() {
         </Link>
         <h1 className="text-3xl font-bold">Reset Password</h1>
         <p className="text-balance text-muted-foreground">Enter your email</p>
+        {error && <ErrorAlert title="Sign In failed" description={error} />}
       </CardHeader>
-      {error && <ErrorAlert title="Sign In failed" description={error} />}
       <CardContent className="grid gap-2">
         <form onSubmit={handleSubmit(onSendResetEmail)}>
           <Label htmlFor="email*">Email*</Label>

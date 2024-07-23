@@ -18,8 +18,18 @@ export const resetPwdSchema = object({
   email: string().min(1, "Email is required").email("Invalid email"),
 });
 
+export const newPwdSchema = object({
+  password: string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: string().min(6, "Password must be at least 6 characters"),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords must match",
+  path: ["confirmPassword"],
+});
+
 export type signinSchemaType = z.infer<typeof signinSchema>;
 
 export type signupSchemaType = z.infer<typeof signupSchema>;
 
 export type resetPwdSchemaType = z.infer<typeof resetPwdSchema>;
+
+export type newPwdSchemaType = z.infer<typeof newPwdSchema>;

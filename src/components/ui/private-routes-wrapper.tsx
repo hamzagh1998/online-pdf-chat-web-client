@@ -3,7 +3,7 @@ import { Navigate } from "react-router-dom";
 import { useIsAuthenticated } from "@/hooks/use-is-authenticated";
 import { AUTH_PATHES } from "@/routes/auth.routes";
 
-import { SplashScreen } from "./splash-screen";
+import { SplashScreen } from "../splash-screen";
 
 type PrivateRouteProps = {
   children: React.ReactNode;

@@ -1,3 +1,4 @@
+import { MainPage } from "@/pages/main/main";
 import { RouteObject } from "react-router";
 
 export const MAIN_PATHES = {
@@ -8,6 +9,6 @@ export const mainRoutes: RouteObject[] = [
   //* main pages
   {
     path: MAIN_PATHES.MAIN,
-    element: <h1>mail</h1>,
+    element: <MainPage />,
   },
 ];

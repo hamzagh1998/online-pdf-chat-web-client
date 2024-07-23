@@ -5,7 +5,8 @@ import { router } from "./routes";
 
 import { ThemeProvider } from "./providers/theme-provider";
 
-import { SplashScreen } from "./components/ui/splash-screen";
+import { SplashScreen } from "./components/splash-screen";
+import { Toaster } from "./components/ui/toaster";
 
 export function App() {
   return (
@@ -13,6 +14,7 @@ export function App() {
       <Suspense fallback={<SplashScreen />}>
         <RouterProvider router={router} />
       </Suspense>
+      <Toaster />
     </ThemeProvider>
   );
 }

@@ -84,8 +84,8 @@ export function SigninForm() {
       <CardHeader className="grid gap-2">
         <h1 className="text-3xl font-bold">Sign In</h1>
         <p className="text-balance text-muted-foreground">Welcome back</p>
+        {error && <ErrorAlert title="Sign In failed" description={error} />}
       </CardHeader>
-      {error && <ErrorAlert title="Sign In failed" description={error} />}
 
       <CardContent>
         <div className="flex justify-between items-center gap-2 mt-4">

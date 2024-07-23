@@ -5,6 +5,8 @@ import {
   signInWithEmailAndPassword,
   deleteUser,
   sendEmailVerification,
+  sendPasswordResetEmail,
+  confirmPasswordReset,
 } from "firebase/auth";
 
 import { auth } from "../firebase.config";
@@ -94,4 +96,51 @@ export async function deleteFirebaseCurrentUser() {
 // Send email verification
 export function sendEmailVerificationToUser() {
   return sendEmailVerification(auth.currentUser!);
+}
+
+// send reset password email
+export async function firebasePasswordResetEmail(email: string) {
+  const data: { error: boolean; detail: string | null } = {
+    error: false,
+    detail: null,
+  };
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    data.error = false;
+    data.detail = "Password reset link sent to your email! Check your inbox.";
+  } catch (error) {
+    const errorMessage = (error as AuthError).message;
+    data.error = true;
+    data.detail =
+      firebaseAuthenticationAPIErrors[errorMessage] ||
+      "Unexpected error occurred!";
+  }
+
+  return data;
+}
+
+// New Password
+export async function firebaseConfirmPasswordReset(
+  oobCode: string,
+  newPassword: string
+) {
+  const data: { error: boolean; detail: string | null } = {
+    error: false,
+    detail: null,
+  };
+
+  try {
+    await confirmPasswordReset(auth, oobCode, newPassword);
+    data.error = false;
+    data.detail = "Password has been reset successfully!";
+  } catch (error) {
+    const errorMessage = (error as AuthError).message;
+    data.error = true;
+    data.detail =
+      firebaseAuthenticationAPIErrors[errorMessage] ||
+      "Unexpected error occurred!";
+  }
+
+  return data;
 }

@@ -9,15 +9,15 @@ interface Props {
 
 export function ErrorAlert({ title, description }: Props) {
   return (
-    <Alert className="flex justify-start items-center gap-2 bg-red-100">
+    <Alert className="flex justify-start items-center gap-2 bg-destructive">
       <div>
-        <MdError size={36} className="text-destructive" />
+        <MdError size={36} color="#fff" />
       </div>
-      <div className="">
-        <AlertTitle className="text-lg font-bold text-destructive">
+      <div>
+        <AlertTitle className="text-lg font-bold text-white">
           {title}
         </AlertTitle>
-        <AlertDescription className="text-md text-destructive">
+        <AlertDescription className="text-md text-white">
           {description}
         </AlertDescription>
       </div>

@@ -3,11 +3,13 @@ import { RouteObject } from "react-router";
 import { SigninPage } from "@/pages/auth/signin/signin";
 import { SignupPage } from "@/pages/auth/signin/signup";
 import { ForgetPasswordPage } from "@/pages/auth/signin/forget-pwd";
+import { NewPasswordPage } from "@/pages/auth/signin/new-pwd";
 
 export const AUTH_PATHES = {
   SIGNUP: "/signup",
   SIGNIN: "/signin",
   FORGET_PASSWORD: "/reset-password",
+  NEW_PASSWORD: "/new-password",
 };
 
 export const authRoutes: RouteObject[] = [
@@ -22,5 +24,9 @@ export const authRoutes: RouteObject[] = [
   {
     path: AUTH_PATHES.FORGET_PASSWORD,
     element: <ForgetPasswordPage />,
+  },
+  {
+    path: AUTH_PATHES.NEW_PASSWORD,
+    element: <NewPasswordPage />,
   },
 ];
