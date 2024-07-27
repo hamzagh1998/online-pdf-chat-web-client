@@ -1,32 +1,18 @@
 import { create } from "zustand";
 
-type RoleType = {
-  _id: string;
-  userId: string;
-  entreprise: string | null;
-  role: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-type UserType = {
-  id: string;
+type UserDataType = {
   firstName: string;
   lastName: string;
   email: string;
   photoURL: string;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type UserData = {
-  roles: RoleType[];
-  user: UserType;
+  storageUsageInMb: number;
+  createdAt: Date;
+  updatedAt: Date | null;
 };
 
 type UserState = {
-  userData?: UserData;
-  setUserData: (data: UserData) => void;
+  userData?: UserDataType;
+  setUserData: (data: UserDataType) => void;
 };
 
 export const useUserStore = create<UserState>((set) => ({

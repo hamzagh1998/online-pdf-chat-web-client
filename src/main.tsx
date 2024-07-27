@@ -1,12 +1,16 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
+import { ReactQueryProvider } from "./providers/react-query-provider.tsx";
+
 import { App } from "./App.tsx";
 
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <App />
+    <ReactQueryProvider>
+      <App />
+    </ReactQueryProvider>
   </React.StrictMode>
 );

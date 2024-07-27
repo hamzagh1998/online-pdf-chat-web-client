@@ -26,6 +26,7 @@ import { UserCredential } from "firebase/auth";
 import { deleteFirebaseCurrentUser } from "@/lib/firebase/auth/auth-with-email";
 
 import { signupSchemaType, signupSchema } from "@/schemas/auth";
+import { useSignupUser } from "@/services/auth/queries";
 
 export function SignupForm() {
   const { toast } = useToast();
@@ -47,6 +48,8 @@ export function SignupForm() {
     resolver: zodResolver(signupSchema),
   });
 
+  const signupUserMutation = useSignupUser();
+
   const onEmailSignup: SubmitHandler<signupSchemaType> = async ({
     firstName,
     lastName,
@@ -57,11 +60,11 @@ export function SignupForm() {
       const data = await onFirebaseEmailSignup(email, password);
       if (data?.error) return;
       //* Register user to db
-      // signupUserMutation.mutate({
-      //   firstName: firstName.trim().toLowerCase(),
-      //   lastName: lastName.trim().toLowerCase(),
-      //   email: email.trim().toLowerCase(),
-      // });
+      signupUserMutation.mutate({
+        firstName: firstName.trim().toLowerCase(),
+        lastName: lastName.trim().toLowerCase(),
+        email: email.trim().toLowerCase(),
+      });
       return toast({
         description: "Verification email sent to Your Inbox!",
       });
@@ -83,12 +86,12 @@ export function SignupForm() {
         data.detail as UserCredential["user"];
       const [firstName, lastName] = displayName?.split(" ") || ["", ""];
       //* Register user to db
-      // signupUserMutation.mutate({
-      //   firstName: firstName.trim().toLowerCase(),
-      //   lastName: lastName.trim().toLowerCase(),
-      //   email: email?.trim().toLowerCase() || "",
-      //   photoURL: photoURL || "",
-      // });
+      signupUserMutation.mutate({
+        firstName: firstName.trim().toLowerCase(),
+        lastName: lastName.trim().toLowerCase(),
+        email: email?.trim().toLowerCase()!,
+        photoURL: photoURL!,
+      });
     } catch (err) {
       deleteFirebaseCurrentUser(); // Remove the current user from Firebase in case registration fails in the database
       console.error(`${provider} signup failed`, err);

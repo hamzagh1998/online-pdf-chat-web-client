@@ -1,9 +1,9 @@
 import { RouteObject } from "react-router";
 
-import { SigninPage } from "@/pages/auth/signin/signin";
-import { SignupPage } from "@/pages/auth/signin/signup";
-import { ForgetPasswordPage } from "@/pages/auth/signin/forget-pwd";
-import { NewPasswordPage } from "@/pages/auth/signin/new-pwd";
+import { SigninPage } from "@/pages/auth/signin";
+import { SignupPage } from "@/pages/auth/signup";
+import { ForgetPasswordPage } from "@/pages/auth/forget-pwd";
+import { NewPasswordPage } from "@/pages/auth/new-pwd";
 
 export const AUTH_PATHES = {
   SIGNUP: "/signup",

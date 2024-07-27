@@ -23,6 +23,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
+import { useSignupUser } from "@/services/auth/queries";
 
 export function SigninForm() {
   const {
@@ -42,14 +43,14 @@ export function SigninForm() {
     resolver: zodResolver(signinSchema),
   });
 
+  const signinUserMutation = useSignupUser();
+
   const onEmailSignin: SubmitHandler<signinSchemaType> = async ({
     email,
     password,
   }) => {
     try {
       const data = await onFirebaseEmailSignin(email, password);
-      console.log(data);
-
       if (data?.error) return;
     } catch (err) {
       console.error("Signup failed", err);
@@ -68,12 +69,12 @@ export function SigninForm() {
         data.detail as UserCredential["user"];
       const [firstName, lastName] = displayName?.split(" ") || ["", ""];
       //* Register user to db
-      // signupUserMutation.mutate({
-      //   firstName: firstName.trim().toLowerCase(),
-      //   lastName: lastName.trim().toLowerCase(),
-      //   email: email?.trim().toLowerCase() || "",
-      //   photoURL: photoURL || "",
-      // });
+      signinUserMutation.mutate({
+        firstName: firstName.trim().toLowerCase(),
+        lastName: lastName.trim().toLowerCase(),
+        email: email?.trim().toLowerCase() || "",
+        photoURL: photoURL || "",
+      });
     } catch (err) {
       deleteFirebaseCurrentUser(); // Remove the current user from Firebase in case registration fails in the database
       console.error(`${provider} signup failed`, err);
