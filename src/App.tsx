@@ -28,7 +28,7 @@ export function App() {
   useEffect(() => {
     if (!data) return;
 
-    setUserData(data.detail);
+    setUserData(data);
   }, [data]);
 
   return (

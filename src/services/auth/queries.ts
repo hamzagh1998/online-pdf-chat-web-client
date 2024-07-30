@@ -23,7 +23,7 @@ export function useSignupUser(): UseMutationResult<
 
 export function useUserData(
   isAuthenticated: boolean
-): UseQueryResult<{ detail: User }, Error> {
+): UseQueryResult<User, Error> {
   return useQuery({
     queryKey: ["userData"],
     queryFn: getUserData,

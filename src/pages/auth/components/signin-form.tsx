@@ -65,14 +65,14 @@ export function SigninForm() {
         ? onFirebaseGithubSignin()
         : onFirebaseFacebookSignin());
       if (data?.error) return;
-      const { displayName, email, photoURL } =
+      const { displayName, email, photoURL, uid } =
         data.detail as UserCredential["user"];
       const [firstName, lastName] = displayName?.split(" ") || ["", ""];
       //* Register user to db
       signinUserMutation.mutate({
         firstName: firstName.trim().toLowerCase(),
         lastName: lastName.trim().toLowerCase(),
-        email: email?.trim().toLowerCase() || "",
+        email: provider === "facebook" ? uid : email!.trim().toLowerCase(),
         photoURL: photoURL || "",
       });
     } catch (err) {
