@@ -1,3 +1,30 @@
+import { PdfReader } from "./pdf-reader";
+import { ChatSection } from "./chat-section";
+import { SideBar } from "./side-bar";
+
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+
 export function ResizableWrapper() {
-  return <div>resizable-wrapper</div>;
+  return (
+    <div className="flex justify-start items-start w-full h-full">
+      <div className="w-2/12 h-full border-r border-secondary">
+        <SideBar />
+      </div>
+      <div className="w-10/12 h-full">
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel>
+            <PdfReader />
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel>
+            <ChatSection />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </div>
+    </div>
+  );
 }

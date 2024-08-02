@@ -1,12 +1,13 @@
-import { auth } from "@/lib/firebase/firebase.config";
-
-import { Button } from "@/components/ui/button";
+import { HeadView } from "./components/desktop-view/head-view";
+import { ResizableWrapper } from "./components/desktop-view/resizable-wrapper";
 
 export function MainPage() {
-  const signout = () => auth.signOut();
   return (
-    <Button variant="default" onClick={signout}>
-      Signout
-    </Button>
+    <div className="w-full h-screen">
+      <HeadView />
+      <div className="w-full h-full">
+        <ResizableWrapper />
+      </div>
+    </div>
   );
 }

@@ -11,6 +11,7 @@ export type User = {
   email: string;
   photoURL: string;
   storageUsageInMb: number;
+  plan: string;
   createdAt: Date;
   updatedAt: Date | null;
 };
