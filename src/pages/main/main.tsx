@@ -5,9 +5,7 @@ export function MainPage() {
   return (
     <div className="w-full h-screen">
       <HeadView />
-      <div className="w-full h-full">
-        <ResizableWrapper />
-      </div>
+      <ResizableWrapper />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import { RiDatabase2Line } from "react-icons/ri";
+import { FaBell } from "react-icons/fa";
 
 import { useUserStore } from "@/hooks/store/use-user-store";
 
@@ -19,7 +20,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { capitalizer } from "@/lib/utils";
-import { FaBell } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export function HeadView() {
   const { userData } = useUserStore();
@@ -29,11 +30,11 @@ export function HeadView() {
   return (
     <nav className="w-full flex justify-between items-center p-4 border border-b-primary">
       {/* icon */}
-      <div className="w-fit flex justify-start items-center gap-2">
+      <div className="w-fit flex justify-start items-center gap-2 cursor-pointer">
         <img src="icon.png" height={32} width={32} />
-        <p className="text-2xl font-bold tracking-wide text-primary">
+        <Link to="/" className="text-2xl font-bold tracking-wide text-primary">
           OnlinePDFChat
-        </p>
+        </Link>
       </div>
       <div className="w-full flex justify-end items-center gap-2">
         <DropdownMenu>

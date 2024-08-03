@@ -19,7 +19,10 @@ export function ResizableWrapper() {
           <ResizablePanel>
             <PdfReader />
           </ResizablePanel>
-          <ResizableHandle withHandle />
+          <ResizableHandle
+            className="transition-colors delay-150 hover:bg-primary"
+            withHandle
+          />
           <ResizablePanel>
             <ChatSection />
           </ResizablePanel>

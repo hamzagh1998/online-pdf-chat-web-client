@@ -21,6 +21,30 @@ body::-webkit-scrollbar {
   overflow-y: scroll;
 }
 
+/* Hide scrollbar for all div elements */
+div::-webkit-scrollbar {
+  display: none;
+}
+
+div {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Hide the up and down arrows from number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .progress {
   animation: progress 1s infinite linear;
 }
