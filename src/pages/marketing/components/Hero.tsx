@@ -15,7 +15,7 @@ export const Hero = () => {
         <main className="text-4xl md:text-6xl font-bold">
           <h2 className="inline">
             <span className="inline bg-gradient-to-r from-[#f97316] via-[#ff843c] to-[#ff955d] text-transparent bg-clip-text">
-              FreePDFChat
+              OnlinePDFChat
             </span>
             <br />
             Unlock the Power of Your Pdf Documents

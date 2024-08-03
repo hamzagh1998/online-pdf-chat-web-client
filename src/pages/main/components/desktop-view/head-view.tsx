@@ -19,6 +19,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { capitalizer } from "@/lib/utils";
+import { FaBell } from "react-icons/fa";
 
 export function HeadView() {
   const { userData } = useUserStore();
@@ -31,7 +32,7 @@ export function HeadView() {
       <div className="w-fit flex justify-start items-center gap-2">
         <img src="icon.png" height={32} width={32} />
         <p className="text-2xl font-bold tracking-wide text-primary">
-          FreePDFChat
+          OnlinePDFChat
         </p>
       </div>
       <div className="w-full flex justify-end items-center gap-2">
@@ -39,7 +40,7 @@ export function HeadView() {
           <DropdownMenuTrigger asChild>
             <Avatar>
               <AvatarImage
-                className="rounded-full h-10 w-h-10 cursor-pointer border-2 hover:border-primary"
+                className="rounded-full h-9 w-h-9 cursor-pointer border-2 hover:border-primary"
                 src={userData?.photoURL}
                 alt="Avatar"
               />
@@ -77,6 +78,9 @@ export function HeadView() {
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
+        <div className="cursor-pointer hover:bg-secondary p-2 rounded-md">
+          <FaBell size={20} />
+        </div>
         <ModeToggle />
       </div>
     </nav>

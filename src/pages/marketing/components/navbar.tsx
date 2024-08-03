@@ -29,7 +29,7 @@ export const Navbar = () => {
               className="ml-2 font-bold text-2xl flex gap-2 items-start justify-center text-primary"
             >
               <LogoIcon />
-              FreePDFChat
+              OnlinePDFChat
             </a>
           </NavigationMenuItem>
 
