@@ -19,7 +19,7 @@ export function App() {
 
   const isAuthenticated = useIsAuthenticated();
 
-  const { data, isPending, error } = useUserData(!!isAuthenticated);
+  const { data, error } = useUserData(!!isAuthenticated);
 
   if (error) {
     // TODO: Handle error
@@ -33,13 +33,11 @@ export function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      {isPending ? (
-        <SplashScreen />
-      ) : (
+      {
         <Suspense fallback={<SplashScreen />}>
           <RouterProvider router={router} />
         </Suspense>
-      )}
+      }
       <Toaster />
     </ThemeProvider>
   );

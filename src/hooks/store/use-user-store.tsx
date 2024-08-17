@@ -1,11 +1,24 @@
 import { create } from "zustand";
 
-type UserDataType = {
+export type ConversationType = {
+  id: string;
+  name: string;
+  owner: string;
+  members: string[];
+  participants: string[];
+  isPublic: boolean;
+  isArchived: boolean;
+  createdAt: Date;
+};
+
+export type UserDataType = {
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
   photoURL: string;
   storageUsageInMb: number;
+  conversations: ConversationType[];
   plan: string;
   createdAt: Date;
   updatedAt: Date | null;

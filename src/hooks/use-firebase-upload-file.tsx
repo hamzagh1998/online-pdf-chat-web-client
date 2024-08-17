@@ -28,9 +28,7 @@ export function useFirebaseUploadFile() {
         setError(res.detail as string);
         return;
       }
-      return res.detail as {
-        url: string;
-      }; // success
+      return res.detail;
     } catch (error) {
       if (error instanceof Error) {
         setError(error?.message);

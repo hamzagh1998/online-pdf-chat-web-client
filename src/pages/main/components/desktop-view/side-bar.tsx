@@ -1,7 +1,7 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdFilterList, MdFilterListOff } from "react-icons/md";
 import { FiLoader } from "react-icons/fi";
-import { TbEdit } from "react-icons/tb";
+import { TiDocumentAdd } from "react-icons/ti";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -16,17 +16,24 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { CustomSelect } from "@/components/custom-select";
 import { ErrorAlert } from "@/components/error-alert";
+import { useCreateConversation } from "@/services/conversation/queries";
+import { useUserData } from "@/services/auth/queries";
 
 export function SideBar() {
-  const { userData } = useUserStore();
+  const { userData, setUserData } = useUserStore();
 
   const { error, isPending, onAddFile } = useFirebaseUploadFile();
 
   const ref = useRef<HTMLInputElement>(null);
 
   const [showFilter, setShowFilter] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const createConversationMutation = useCreateConversation();
+  const { data } = useUserData(!isUploading);
 
   const dates = [
+    "all times",
     "today",
     "yesterday",
     "this week",
@@ -45,34 +52,59 @@ export function SideBar() {
     resolver: zodResolver(validationSchema),
   });
 
+  const onSearch = (value: string) => {
+    setValue("search", value);
+  };
+
+  const onDateChange = (value: string) => {
+    setValue("date", value);
+    trigger("date");
+    // TODO: filter by date
+  };
+
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files[0]) {
       setValue("file", files);
       trigger("file");
       // Save the pdf file to the storage bucket
-      const fileURL = await onAddFile(
+      const fileData = await onAddFile(
         files[0],
-        25 * 1024 * 1024, // In MB
+        30 * 1024 * 1024, // In MB
         userData?.email || "",
         "add"
       );
-      console.log(fileURL);
 
-      // TODO: send the file data to the server
+      if (!fileData || typeof fileData === "string") return;
+      setIsUploading(true);
+
+      try {
+        await createConversationMutation.mutateAsync({
+          email: userData?.email as string,
+          fileName: fileData.fileName,
+          fileSizeInMB: +fileData.fileSizeMB.toFixed(2),
+          fileURL: fileData.url,
+        });
+        setIsUploading(false);
+      } catch (error) {
+        console.error("Failed to create a new conversation:", error);
+      }
     }
   };
 
-  const onDateChange = (value: string) => {
-    setValue("date", value);
-    trigger("date");
-    // TODO: send the selected date to the server
-  };
+  useEffect(() => {
+    if (!data) return;
+    setUserData(data);
+  }, [data]);
 
   return (
     <div className="p-4 w-full space-y-6">
       <div className="w-full flex justify-between items-center gap-2">
-        <Input className="w-full" placeholder="Search..." />
+        <Input
+          className="w-full"
+          onChange={(e) => onSearch(e.target.value)}
+          placeholder="Search..."
+        />
         <button
           className="cursor-pointer"
           type="button"
@@ -84,7 +116,7 @@ export function SideBar() {
             <MdFilterList size={24} />
           )}
         </button>
-        {isPending ? (
+        {isPending || isUploading ? (
           <div className="animate-spin">
             <FiLoader size={24} />
           </div>
@@ -94,7 +126,7 @@ export function SideBar() {
             type="button"
             onClick={() => ref.current?.click()}
           >
-            <TbEdit size={24} />
+            <TiDocumentAdd size={24} />
             <input
               type="file"
               className="hidden"

@@ -7,23 +7,25 @@ import {
 
 import { getUserData, signupUser } from "./api";
 
-import { Signup, User } from "./types";
+import { UserDataType } from "@/hooks/store/use-user-store";
+
+import { SignupPayload } from "./types";
 
 export function useSignupUser(): UseMutationResult<
   void,
   Error,
-  Signup,
+  SignupPayload,
   unknown
 > {
   return useMutation({
     mutationKey: ["signup"],
-    mutationFn: (payload: Signup) => signupUser(payload),
+    mutationFn: (payload: SignupPayload) => signupUser(payload),
   });
 }
 
 export function useUserData(
   isAuthenticated: boolean
-): UseQueryResult<User, Error> {
+): UseQueryResult<UserDataType, Error> {
   return useQuery({
     queryKey: ["userData"],
     queryFn: getUserData,
