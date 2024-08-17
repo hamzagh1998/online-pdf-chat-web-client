@@ -33,6 +33,22 @@ div {
   /* Firefox */
 }
 
+/* styles.css */
+.date-picker {
+  position: relative;
+}
+
+.date-picker::before {
+  content: '';
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"><path d="M5.5 9.5H4v1h1.5V9.5zm3 0H7v1h1.5V9.5zm3 0h-1.5v1H11.5V9.5zm3 0h-1.5v1H14.5V9.5zm3 0h-1.5v1H17.5V9.5zm2.5-6h-19c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h19c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2zm0 16h-19V7h19v12z"/></svg>') no-repeat;
+  width: 24px;
+  height: 24px;
+}
+
 /* Hide the up and down arrows from number inputs */
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {

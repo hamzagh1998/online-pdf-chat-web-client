@@ -10,7 +10,7 @@ import {
 
 export function ResizableWrapper() {
   return (
-    <div className="flex justify-start items-start w-full h-full">
+    <section className="flex justify-start items-start w-full h-full">
       <div className="w-2/12 h-full border-r border-secondary">
         <SideBar />
       </div>
@@ -28,6 +28,6 @@ export function ResizableWrapper() {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-    </div>
+    </section>
   );
 }

@@ -30,13 +30,13 @@ export function HeadView() {
   return (
     <nav className="w-full flex justify-between items-center p-4 border border-b-primary">
       {/* icon */}
-      <div className="w-fit flex justify-start items-center gap-2 cursor-pointer">
+      <section className="w-fit flex justify-start items-center gap-2 cursor-pointer">
         <img src="icon.png" height={32} width={32} />
         <Link to="/" className="text-2xl font-bold tracking-wide text-primary">
           OnlinePDFChat
         </Link>
-      </div>
-      <div className="w-full flex justify-end items-center gap-2">
+      </section>
+      <section className="w-full flex justify-end items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar>
@@ -79,11 +79,11 @@ export function HeadView() {
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <div className="cursor-pointer hover:bg-secondary p-2 rounded-md">
+        <button className="cursor-pointer hover:bg-secondary p-2 rounded-md">
           <FaBell size={20} />
-        </div>
+        </button>
         <ModeToggle />
-      </div>
+      </section>
     </nav>
   );
 }

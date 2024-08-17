@@ -3,9 +3,9 @@ import { ResizableWrapper } from "./components/desktop-view/resizable-wrapper";
 
 export function MainPage() {
   return (
-    <div className="w-full h-screen">
+    <main className="w-full h-screen">
       <HeadView />
       <ResizableWrapper />
-    </div>
+    </main>
   );
 }

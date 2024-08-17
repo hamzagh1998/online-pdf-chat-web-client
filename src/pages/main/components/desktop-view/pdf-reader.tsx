@@ -1,8 +1,10 @@
-import { Input } from "@/components/ui/input";
-import PdfViwer from "@/hooks/pdf-viewer";
 import { useState } from "react";
+import PdfViwer from "@/hooks/pdf-viewer";
 import { GrFormPrevious, GrFormNext } from "react-icons/gr";
 import { VscLayoutSidebarLeftOff } from "react-icons/vsc";
+import { IoMdDownload } from "react-icons/io";
+
+import { Input } from "@/components/ui/input";
 
 const pdfUrl =
   "https://res.cloudinary.com/fake-company/image/upload/v1719685563/knfftysndf9m7si50zcr.pdf";
@@ -59,6 +61,9 @@ export function PdfReader() {
             <GrFormNext size={24} />
           </button>
         </div>
+        <button onClick={() => null}>
+          <IoMdDownload size={20} />
+        </button>
       </nav>
       {/* PDF content */}
       <div className="w-full overflow-auto">
