@@ -5,7 +5,7 @@ import { TiDocumentAdd } from "react-icons/ti";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { useUserStore } from "@/hooks/store/use-user-store";
+import { ConversationType, useUserStore } from "@/hooks/store/use-user-store";
 import { useFirebaseUploadFile } from "@/hooks/use-firebase-upload-file";
 
 import { validationSchema, validationSchemaType } from "@/schemas/main";
@@ -92,10 +92,73 @@ export function SideBar() {
     }
   };
 
+  const organizeConversations = (conversations: ConversationType[]) => {
+    const now = new Date();
+    const today: ConversationType[] = [];
+    const yesterday: ConversationType[] = [];
+    const thisWeek: ConversationType[] = [];
+    const lastWeek: ConversationType[] = [];
+    const thisMonth: ConversationType[] = [];
+    const lastMonth: ConversationType[] = [];
+    const thisYear: ConversationType[] = [];
+    const lastYear: ConversationType[] = [];
+
+    for (const conversation of conversations) {
+      const createdAt = new Date(conversation.createdAt);
+
+      if (createdAt.toDateString() === now.toDateString()) {
+        today.push(conversation);
+      } else if (
+        createdAt.toDateString() ===
+        new Date(now.getTime() - 24 * 60 * 60 * 1000).toDateString()
+      ) {
+        yesterday.push(conversation);
+      } else if (
+        createdAt > new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+      ) {
+        thisWeek.push(conversation);
+      } else if (
+        createdAt > new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
+      ) {
+        lastWeek.push(conversation);
+      } else if (
+        createdAt > new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
+      ) {
+        thisMonth.push(conversation);
+      } else if (
+        createdAt > new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000)
+      ) {
+        lastMonth.push(conversation);
+      } else if (createdAt.getFullYear() === now.getFullYear()) {
+        thisYear.push(conversation);
+      } else if (createdAt.getFullYear() === now.getFullYear() - 1) {
+        lastYear.push(conversation);
+      }
+    }
+
+    return {
+      today,
+      yesterday,
+      thisWeek,
+      lastWeek,
+      thisMonth,
+      lastMonth,
+      thisYear,
+      lastYear,
+    };
+  };
+
   useEffect(() => {
     if (!data) return;
     setUserData(data);
   }, [data]);
+
+  useEffect(() => {
+    console.log(
+      "userData",
+      organizeConversations(userData?.conversations || [])
+    );
+  }, [userData]);
 
   return (
     <div className="p-4 w-full space-y-6">
