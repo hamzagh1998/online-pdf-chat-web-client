@@ -15,7 +15,7 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -42,12 +42,9 @@ export function HeadView() {
             <Avatar>
               <AvatarImage
                 className="rounded-full h-9 w-h-9 cursor-pointer border-2 hover:border-primary"
-                src={userData?.photoURL}
+                src={userData?.photoURL || ""}
                 alt="Avatar"
               />
-              <AvatarFallback>
-                {userData?.firstName[0]! + userData?.lastName[0]!}
-              </AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">
@@ -59,7 +56,8 @@ export function HeadView() {
             </DropdownMenuLabel>
             <DropdownMenuLabel>
               <DropdownMenuShortcut className="mb-2 flex justify-end items-center gap-2">
-                <RiDatabase2Line size={20} /> {userData?.storageUsageInMb || 0}
+                <RiDatabase2Line size={20} />{" "}
+                {(userData?.storageUsageInMb || 0).toFixed(2)}
                 /200MB
               </DropdownMenuShortcut>
               <Progress value={userData?.storageUsageInMb || 0} />

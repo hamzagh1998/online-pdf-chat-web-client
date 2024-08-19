@@ -1,48 +1,50 @@
 import { useEffect, useRef, useState } from "react";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 import { MdFilterList, MdFilterListOff } from "react-icons/md";
 import { FiLoader } from "react-icons/fi";
 import { TiDocumentAdd } from "react-icons/ti";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { ConversationType, useUserStore } from "@/hooks/store/use-user-store";
+import { useUserStore } from "@/hooks/store/use-user-store";
+import { useConversationStore } from "@/hooks/store/use-conversation-store";
+import { ConversationType } from "@/hooks/store/common-types";
+
 import { useFirebaseUploadFile } from "@/hooks/use-firebase-upload-file";
 
 import { validationSchema, validationSchemaType } from "@/schemas/main";
+
+import { useUserData } from "@/services/auth/queries";
 
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { CustomSelect } from "@/components/custom-select";
-import { ErrorAlert } from "@/components/error-alert";
 import { useCreateConversation } from "@/services/conversation/queries";
-import { useUserData } from "@/services/auth/queries";
+
+import { ConversationsList } from "./conversation-list";
 
 export function SideBar() {
   const { userData, setUserData } = useUserStore();
+  const { currentConversation, setConversationData } = useConversationStore();
 
-  const { error, isPending, onAddFile } = useFirebaseUploadFile();
+  const { isPending, onAddFile } = useFirebaseUploadFile();
+
+  const createConversationMutation = useCreateConversation();
 
   const ref = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLInputElement>(null);
 
   const [showFilter, setShowFilter] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [filtredConversations, setFiltredConversations] = useState<
+    ConversationType[]
+  >([]);
+  const [search, setSearch] = useState("");
+  const [isShared, setIsShared] = useState(false);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
 
-  const createConversationMutation = useCreateConversation();
   const { data } = useUserData(!isUploading);
-
-  const dates = [
-    "all times",
-    "today",
-    "yesterday",
-    "this week",
-    "last week",
-    "this month",
-    "last month",
-    "this year",
-    "last year",
-  ];
 
   const {
     setValue,
@@ -52,21 +54,12 @@ export function SideBar() {
     resolver: zodResolver(validationSchema),
   });
 
-  const onSearch = (value: string) => {
-    setValue("search", value);
-  };
-
-  const onDateChange = (value: string) => {
-    setValue("date", value);
-    trigger("date");
-    // TODO: filter by date
-  };
-
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files[0]) {
       setValue("file", files);
       trigger("file");
+
       // Save the pdf file to the storage bucket
       const fileData = await onAddFile(
         files[0],
@@ -92,60 +85,18 @@ export function SideBar() {
     }
   };
 
-  const organizeConversations = (conversations: ConversationType[]) => {
-    const now = new Date();
-    const today: ConversationType[] = [];
-    const yesterday: ConversationType[] = [];
-    const thisWeek: ConversationType[] = [];
-    const lastWeek: ConversationType[] = [];
-    const thisMonth: ConversationType[] = [];
-    const lastMonth: ConversationType[] = [];
-    const thisYear: ConversationType[] = [];
-    const lastYear: ConversationType[] = [];
-
-    for (const conversation of conversations) {
-      const createdAt = new Date(conversation.createdAt);
-
-      if (createdAt.toDateString() === now.toDateString()) {
-        today.push(conversation);
-      } else if (
-        createdAt.toDateString() ===
-        new Date(now.getTime() - 24 * 60 * 60 * 1000).toDateString()
-      ) {
-        yesterday.push(conversation);
-      } else if (
-        createdAt > new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
-      ) {
-        thisWeek.push(conversation);
-      } else if (
-        createdAt > new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000)
-      ) {
-        lastWeek.push(conversation);
-      } else if (
-        createdAt > new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
-      ) {
-        thisMonth.push(conversation);
-      } else if (
-        createdAt > new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000)
-      ) {
-        lastMonth.push(conversation);
-      } else if (createdAt.getFullYear() === now.getFullYear()) {
-        thisYear.push(conversation);
-      } else if (createdAt.getFullYear() === now.getFullYear() - 1) {
-        lastYear.push(conversation);
-      }
+  const scroll = () => {
+    if (containerRef.current) {
+      isScrolledToBottom
+        ? containerRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "end",
+          })
+        : containerRef.current.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
     }
-
-    return {
-      today,
-      yesterday,
-      thisWeek,
-      lastWeek,
-      thisMonth,
-      lastMonth,
-      thisYear,
-      lastYear,
-    };
   };
 
   useEffect(() => {
@@ -154,18 +105,44 @@ export function SideBar() {
   }, [data]);
 
   useEffect(() => {
-    console.log(
-      "userData",
-      organizeConversations(userData?.conversations || [])
-    );
-  }, [userData]);
+    if (!userData?.conversations.length) return;
+    setFiltredConversations(userData.conversations);
+  }, [userData?.conversations]);
+
+  useEffect(() => {
+    const convId = JSON.parse(localStorage.getItem("convId")!);
+    if (!filtredConversations.length || !convId) return;
+
+    const conversation: ConversationType = userData?.conversations.find(
+      (conv) => conv._id === convId
+    )!;
+    setConversationData(conversation);
+  }, [filtredConversations]);
+
+  // filters
+  useEffect(() => {
+    if (!userData?.conversations.length) return;
+    let conversations =
+      userData?.conversations.filter((conversation) =>
+        conversation.name.toLowerCase().includes(search.toLowerCase())
+      ) || [];
+    if (isShared) {
+      conversations =
+        conversations.filter(
+          (conversation) => conversation.isPublic === isShared
+        ) || [];
+    }
+    setFiltredConversations(conversations);
+  }, [search, isShared]);
+
+  useEffect(() => scroll(), [isScrolledToBottom]);
 
   return (
-    <div className="p-4 w-full space-y-6">
+    <div className="group relative p-4 w-full space-y-6" ref={containerRef}>
       <div className="w-full flex justify-between items-center gap-2">
         <Input
           className="w-full"
-          onChange={(e) => onSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search..."
         />
         <button
@@ -205,7 +182,10 @@ export function SideBar() {
       {/* filters */}
       {showFilter && (
         <div className="w-full flex justify-between items-center gap-2">
-          <RadioGroup defaultValue="comfortable">
+          <RadioGroup
+            onValueChange={(value) => setIsShared(value === "shared")}
+            defaultValue="all"
+          >
             <div className="flex justify-start items-center gap-4">
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="all" id="r1" />
@@ -217,15 +197,27 @@ export function SideBar() {
               </div>
             </div>
           </RadioGroup>
-          <CustomSelect
-            placeholder="Select a date..."
-            setValue={onDateChange}
-            options={dates}
-          />
         </div>
       )}
       <Separator orientation="horizontal" />
-      {error && <ErrorAlert title="Upload failed" description={error} />}
+      {/* COnversations */}
+      {userData?.conversations.length ? (
+        <ConversationsList
+          conversations={filtredConversations}
+          currentConversation={currentConversation}
+          setConversationData={setConversationData}
+        />
+      ) : null}
+      <div
+        className="hidden p-3 rounded-full w-fit h-fit group-hover:flex justify-center items-center cursor-pointer sticky bottom-5 left-96 bg-secondary hover:opacity-80"
+        onClick={() => setIsScrolledToBottom(!isScrolledToBottom)}
+      >
+        {isScrolledToBottom ? (
+          <FaChevronUp size={16} />
+        ) : (
+          <FaChevronDown size={16} />
+        )}
+      </div>
     </div>
   );
 }

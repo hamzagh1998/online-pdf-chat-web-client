@@ -16,12 +16,11 @@ const options = {
 
 const resizeObserverOptions = {};
 
-const maxWidth = 1000;
-
 type PdfViwerProps = {
   pdfUrl: string;
   currentPage: number;
   totalPages: number;
+  width: number;
   setTotalPages: (totalPages: number) => void;
   setCurrentPage: (currentPage: number) => void;
 };
@@ -30,6 +29,7 @@ export default function PdfViwer({
   pdfUrl,
   currentPage,
   totalPages,
+  width,
   setTotalPages,
   setCurrentPage,
 }: PdfViwerProps) {
@@ -76,9 +76,7 @@ export default function PdfViwer({
                 <Page
                   pageNumber={index + 1}
                   width={
-                    containerWidth
-                      ? Math.min(containerWidth, maxWidth)
-                      : maxWidth
+                    containerWidth ? Math.min(containerWidth, width) : width
                   }
                 />
               </div>

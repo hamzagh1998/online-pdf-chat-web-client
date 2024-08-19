@@ -17,3 +17,20 @@ export function capitalizer(string: string) {
     return word.trim();
   }
 }
+
+export function convertUTCToLocal(utcDateStr: string) {
+  const utcDate = new Date(utcDateStr);
+
+  const options: Intl.DateTimeFormatOptions = {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false, // Use 24-hour time format
+  };
+
+  const localDateStr = utcDate.toLocaleString(undefined, options);
+
+  return localDateStr.replace(",", " -");
+}

@@ -1,15 +1,6 @@
 import { create } from "zustand";
 
-export type ConversationType = {
-  id: string;
-  name: string;
-  owner: string;
-  members: string[];
-  participants: string[];
-  isPublic: boolean;
-  isArchived: boolean;
-  createdAt: Date;
-};
+import { ConversationType } from "./common-types";
 
 export type UserDataType = {
   id: string;

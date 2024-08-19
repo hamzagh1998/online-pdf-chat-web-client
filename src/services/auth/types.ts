@@ -1,4 +1,4 @@
-import { ConversationType } from "@/hooks/store/use-user-store";
+import { ConversationType } from "@/hooks/store/common-types";
 
 export type SignupPayload = {
   firstName: string;
