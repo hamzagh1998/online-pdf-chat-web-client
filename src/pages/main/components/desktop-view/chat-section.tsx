@@ -1,40 +1,92 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { IoSend } from "react-icons/io5";
 import { FaLock, FaShareAlt } from "react-icons/fa";
 
+import { getAuth } from "firebase/auth";
+
 import { useConversationStore } from "@/hooks/store/use-conversation-store";
+import { useUserStore } from "@/hooks/store/use-user-store";
 
 import { CustomTooltip } from "@/components/custom-tooltip";
+import { useToast } from "@/components/ui/use-toast";
+
+import { MessageType } from "../../types";
 
 export function ChatSection() {
   const { currentConversation } = useConversationStore();
+  const { userData } = useUserStore();
 
-  const [search, setSearch] = useState("");
+  const { toast } = useToast();
 
-  const ws = new WebSocket(
-    import.meta.env.MODE === "development"
-      ? import.meta.env.VITE_REACT_APP_WS_BASE_DEV_URL
-      : import.meta.env.VITE_REACT_APP_WS_BASE_PRO_URL
-  );
+  const [search, setSearch] = useState<string>("");
+  const [ws, setWs] = useState<WebSocket | null>(null);
 
-  ws.onopen = () => {
-    console.log("Connected to WebSocket");
+  const [messages, setMessages] = useState<MessageType[]>([]);
+  const [users, setUsers] = useState<string[]>([]);
+
+  const initializeWebSocket = async () => {
+    try {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (user && currentConversation?._id) {
+        const token = await user.getIdToken();
+        const socket = new WebSocket(
+          (import.meta.env.MODE === "development"
+            ? import.meta.env.VITE_REACT_APP_WS_BASE_DEV_URL
+            : import.meta.env.VITE_REACT_APP_WS_BASE_PRO_URL) +
+            "?token=" +
+            encodeURIComponent(token) +
+            "&conversationId=" +
+            currentConversation._id
+        );
+
+        socket.onerror = (error) => {
+          console.error("WebSocket error:", error);
+        };
+
+        socket.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          if (data.type === "notification") {
+            toast({ description: data.content });
+          } else if (data.type === "messages") {
+            setMessages(data.content.messages);
+            setUsers(data.content.users);
+          }
+        };
+
+        socket.onclose = () => {
+          console.log("WebSocket connection closed");
+        };
+
+        setWs(socket);
+      }
+    } catch (error) {
+      console.error("Failed to initialize WebSocket:", error);
+    }
   };
 
-  ws.onerror = (error) => {
-    console.error("WebSocket error:", error);
-  };
-
-  ws.onclose = () => {
-    console.log("WebSocket connection closed");
-  };
+  useEffect(() => {
+    if (!currentConversation?._id) return;
+    initializeWebSocket();
+    return () => {
+      ws?.close();
+    };
+  }, [currentConversation?._id]);
 
   if (!currentConversation) {
     return null;
   }
 
   const onSendQuestion = () => {
-    console.log(search);
+    if (ws && search) {
+      ws.send(
+        JSON.stringify({
+          data: { message: search, userId: userData?.id },
+          type: "question",
+        })
+      );
+      setSearch("");
+    }
   };
 
   return (
@@ -47,7 +99,7 @@ export function ChatSection() {
             </button>
           </CustomTooltip>
         ) : (
-          <CustomTooltip text="share conversation">
+          <CustomTooltip text="Share conversation">
             <button>
               <FaShareAlt size={24} />
             </button>

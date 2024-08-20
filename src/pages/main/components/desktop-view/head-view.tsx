@@ -25,7 +25,10 @@ import { Link } from "react-router-dom";
 export function HeadView() {
   const { userData } = useUserStore();
 
-  const onSignout = () => auth.signOut();
+  const onSignout = () => {
+    localStorage.clear();
+    auth.signOut();
+  };
 
   return (
     <nav className="w-full flex justify-between items-center p-4 border border-b-primary">

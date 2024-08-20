@@ -84,10 +84,10 @@ export function PdfReader({
           <VscLayoutSidebarLeftOff size={24} />
         </button>
         <div className="w-fit flex justify-center items-center gap-4">
-          <button onClick={() => setZoom(zoom + 10)}>
+          <button onClick={() => setZoom(zoom + 50)}>
             <MdOutlineZoomIn size={24} />
           </button>
-          <button onClick={() => setZoom(zoom - 10)}>
+          <button onClick={() => setZoom(zoom - 50)}>
             <MdOutlineZoomOut size={24} />
           </button>
         </div>
