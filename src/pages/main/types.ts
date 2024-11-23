@@ -1,8 +1,13 @@
 export type MessageType = {
   _id: string;
   conversationId: string;
-  isAIResponse: boolean;
+  isAiResponse: boolean;
   content: string;
-  senderId: string;
-  timestamp: Date;
+  sender: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    photoURL: string;
+  };
+  timestamp: string;
 };

@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, Fragment } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { IoSend } from "react-icons/io5";
 import { FaLock, FaShareAlt } from "react-icons/fa";
 
@@ -13,18 +14,69 @@ import { CustomTooltip } from "@/components/custom-tooltip";
 import { useToast } from "@/components/ui/use-toast";
 
 import { MessageType } from "../../types";
+import { capitalizer, cn, convertUTCToLocal } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
+import { FiLoader } from "react-icons/fi";
+
+function formatMessageContent(content: string): React.ReactNode {
+  // Regular Expression to detect patterns like "* **Title:**", "**Title:**", etc.
+  const pattern = /(\*+)?\s?\*\*([^\*:]+):\*\*\s*(.+?)\s?/g;
+
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = pattern.exec(content)) !== null) {
+    const [, sizeMarker = "", title, text] = match;
+
+    // Determine text size based on the number of leading asterisks (*)
+    const textSizeClass =
+      {
+        "***": "text-lg",
+        "**": "text-xl",
+        "*": "text-2xl",
+      }[sizeMarker] || "text-base"; // Default to "text-base" if no size marker
+
+    // Add text before the matched pattern
+    if (match.index > lastIndex) {
+      parts.push(content.slice(lastIndex, match.index));
+    }
+
+    // Add formatted title and text
+    parts.push(
+      <Fragment key={match.index}>
+        <br />
+        <strong className={textSizeClass}>{title}:</strong>
+        <br />
+        <span>{text}</span>
+      </Fragment>
+    );
+
+    lastIndex = pattern.lastIndex;
+  }
+
+  // Add remaining text if any
+  if (lastIndex < content.length) {
+    parts.push(content.slice(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : content;
+}
 
 export function ChatSection() {
-  const { currentConversation } = useConversationStore();
-  const { userData } = useUserStore();
+  const queryClient = useQueryClient();
 
   const { toast } = useToast();
 
+  const { currentConversation } = useConversationStore();
+  const { userData } = useUserStore();
+
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
   const [question, setQuestion] = useState<string>("");
   const [ws, setWs] = useState<WebSocket | null>(null);
-
-  const [messages, setMessages] = useState<MessageType[]>([]);
-  const [users, setUsers] = useState<string[]>([]);
+  const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
+  const [typingMsg, setTypingMsg] = useState<string | null>(null);
 
   const { data, isPending, error } = useGetConversation(
     currentConversation?._id
@@ -46,22 +98,38 @@ export function ChatSection() {
             currentConversation._id
         );
 
+        socket.onopen = () => {
+          toast({ description: "Connection established!" });
+        };
+
         socket.onerror = (error) => {
-          console.error("WebSocket error:", error);
+          toast({ description: "WebSocket error: " + error });
         };
 
         socket.onmessage = (event) => {
           const data = JSON.parse(event.data);
+
           if (data.type === "notification") {
             toast({ description: data.content });
-          } else if (data.type === "messages") {
-            setMessages(data.content.messages);
-            setUsers(data.content.users);
+          }
+
+          if (data.type === "messages") {
+            queryClient
+              .invalidateQueries({
+                queryKey: ["getConversation", currentConversation?._id],
+              })
+              .then(() => setIsAiLoading(false));
+          }
+
+          if (data.type === "typing") {
+            setTypingMsg(data.content);
+            const timeoutId = setTimeout(() => setTypingMsg(null), 1500);
+            return () => clearTimeout(timeoutId);
           }
         };
 
         socket.onclose = () => {
-          console.log("WebSocket connection closed");
+          toast({ description: "Connection closed" });
         };
 
         setWs(socket);
@@ -73,6 +141,7 @@ export function ChatSection() {
 
   const onSendQuestion = () => {
     if (ws && question) {
+      setIsAiLoading(true);
       ws.send(
         JSON.stringify({
           data: { message: question, userId: userData?.id },
@@ -84,25 +153,44 @@ export function ChatSection() {
   };
 
   useEffect(() => {
+    if (!question.length || !ws || !userData) return;
+    ws.send(
+      JSON.stringify({
+        data: {
+          message: capitalizer(userData.firstName) + " is typing...",
+          userId: userData.id,
+        },
+        type: "typing",
+      })
+    );
+  }, [question]);
+
+  useEffect(() => {
     if (!currentConversation?._id) return;
+
     initializeWebSocket();
+
     return () => {
-      ws?.close();
+      ws?.close(); // Clean up on component unmount
     };
   }, [currentConversation?._id]);
 
-  if (!currentConversation) {
-    return null;
+  if (error) {
+    toast({ description: error.message });
   }
 
-  if (error) {
-    return toast({ description: error.message });
-  }
+  useEffect(() => {
+    if (!data) return;
+
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [data]);
 
   return (
     <section className="w-full h-full flex flex-col">
       <nav className="py-3 px-4 border-b border-b-gray-300 flex justify-end items-center">
-        {currentConversation.isPublic ? (
+        {currentConversation?.isPublic ? (
           <CustomTooltip text="Stop sharing">
             <button>
               <FaLock size={24} />
@@ -116,25 +204,112 @@ export function ChatSection() {
           </CustomTooltip>
         )}
       </nav>
-      <div className="w-full h-full overflow-y-scroll p-4"></div>
+      <div className="w-full h-full overflow-y-scroll p-4">
+        {isPending ? (
+          <p className="text-lg text-center w-full mt-auto text-muted-foreground">
+            Loading conversation...
+          </p>
+        ) : (
+          data.data.messages.map((message: MessageType) => (
+            <div
+              key={message._id}
+              className={cn(
+                "w-full flex flex-col gap-2",
+                message._id === userData?.id ? "items-end" : "items-start"
+              )}
+            >
+              <div
+                className={cn(
+                  "w-full flex space-y-4",
+                  message.sender._id === userData?.id
+                )}
+              >
+                <div className="rounded-xl w-full">
+                  <div
+                    className={cn(
+                      "flex gap-2 items-center w-full text-xs rounded-xl p-2 text-muted-foreground",
+                      message.sender._id === userData?.id &&
+                        !message.isAiResponse
+                        ? "justify-end"
+                        : "justify-start"
+                    )}
+                  >
+                    {message.isAiResponse ? (
+                      <img
+                        src="./icon.png"
+                        alt="AI"
+                        className="w-5 h-5 rounded-full"
+                      />
+                    ) : (
+                      <img
+                        src={message.sender.photoURL}
+                        alt="AV"
+                        className="w-5 h-5 rounded-full"
+                      />
+                    )}
+                    <p>
+                      {capitalizer(
+                        message.isAiResponse
+                          ? "AI"
+                          : message.sender.firstName +
+                              " " +
+                              message.sender.lastName +
+                              " - " +
+                              convertUTCToLocal(message.timestamp)
+                      )}
+                    </p>
+                  </div>
+                  <p
+                    className={cn(
+                      "w-fit rounded-xl p-2 bg-secondary",
+                      message.sender._id === userData?.id &&
+                        !message.isAiResponse
+                        ? "float-end bg-primary text-white"
+                        : "float-start"
+                    )}
+                  >
+                    {message.isAiResponse
+                      ? formatMessageContent(message.content)
+                      : message.content}
+                  </p>
+                </div>
+              </div>
+              <Separator orientation="horizontal" />
+            </div>
+          ))
+        )}
+        <div ref={messagesEndRef} />
+      </div>
       <div className="w-full h-16 px-4">
-        <div className="w-full h-full flex justify-between items-center gap-2 rounded-xl px-4 border-2 border-secondary">
-          <input
-            type="text"
-            className="w-full h-full border-none border-0 outline-none bg-transparent"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && onSendQuestion()}
-            placeholder="Ask your question"
-          />
-          <button
-            className="w-fit hover:text-primary disabled:text-muted disabled:cursor-not-allowed"
-            disabled={question.length === 0}
-            onClick={onSendQuestion}
-          >
-            <IoSend size={26} />
-          </button>
-        </div>
+        <p className="w-full text-right text-xs text-muted-foreground">
+          {typingMsg}
+        </p>
+        {isAiLoading ? (
+          <div className="w-full flex justify-center items-center gap-2">
+            <div className="animate-spin">
+              <FiLoader size={24} />
+            </div>
+            <p>Generating response...</p>
+          </div>
+        ) : (
+          <div className="w-full h-full flex justify-between items-center gap-2 rounded-xl px-4 border-2 border-secondary">
+            <input
+              type="text"
+              className="w-full h-full border-none border-0 outline-none bg-transparent"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && onSendQuestion()}
+              placeholder="Ask your question"
+            />
+            <button
+              className="w-fit hover:text-primary disabled:text-muted disabled:cursor-not-allowed"
+              disabled={question.length === 0}
+              onClick={onSendQuestion}
+            >
+              <IoSend size={26} />
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );
