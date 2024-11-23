@@ -15,7 +15,7 @@ export const signupSchema = object({
 });
 
 export const resetPwdSchema = object({
-  email: string().min(1, "Email is required").email("Invalid email"),
+  email: string().min(6, "Email is required").email("Invalid email"),
 });
 
 export const newPwdSchema = object({

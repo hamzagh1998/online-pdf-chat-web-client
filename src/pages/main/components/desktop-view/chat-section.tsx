@@ -7,6 +7,8 @@ import { getAuth } from "firebase/auth";
 import { useConversationStore } from "@/hooks/store/use-conversation-store";
 import { useUserStore } from "@/hooks/store/use-user-store";
 
+import { useGetConversation } from "@/services/conversation/queries";
+
 import { CustomTooltip } from "@/components/custom-tooltip";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -18,11 +20,15 @@ export function ChatSection() {
 
   const { toast } = useToast();
 
-  const [search, setSearch] = useState<string>("");
+  const [question, setQuestion] = useState<string>("");
   const [ws, setWs] = useState<WebSocket | null>(null);
 
   const [messages, setMessages] = useState<MessageType[]>([]);
   const [users, setUsers] = useState<string[]>([]);
+
+  const { data, isPending, error } = useGetConversation(
+    currentConversation?._id
+  );
 
   const initializeWebSocket = async () => {
     try {
@@ -65,6 +71,18 @@ export function ChatSection() {
     }
   };
 
+  const onSendQuestion = () => {
+    if (ws && question) {
+      ws.send(
+        JSON.stringify({
+          data: { message: question, userId: userData?.id },
+          type: "question",
+        })
+      );
+      setQuestion("");
+    }
+  };
+
   useEffect(() => {
     if (!currentConversation?._id) return;
     initializeWebSocket();
@@ -77,17 +95,9 @@ export function ChatSection() {
     return null;
   }
 
-  const onSendQuestion = () => {
-    if (ws && search) {
-      ws.send(
-        JSON.stringify({
-          data: { message: search, userId: userData?.id },
-          type: "question",
-        })
-      );
-      setSearch("");
-    }
-  };
+  if (error) {
+    return toast({ description: error.message });
+  }
 
   return (
     <section className="w-full h-full flex flex-col">
@@ -112,14 +122,14 @@ export function ChatSection() {
           <input
             type="text"
             className="w-full h-full border-none border-0 outline-none bg-transparent"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={question}
+            onChange={(e) => setQuestion(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && onSendQuestion()}
             placeholder="Ask your question"
           />
           <button
             className="w-fit hover:text-primary disabled:text-muted disabled:cursor-not-allowed"
-            disabled={search.length === 0}
+            disabled={question.length === 0}
             onClick={onSendQuestion}
           >
             <IoSend size={26} />

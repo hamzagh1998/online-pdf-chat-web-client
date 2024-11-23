@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import PdfViwer from "@/hooks/pdf-viewer";
+import PdfViwer from "@/components/pdf-viewer";
 import {
   MdOutlineZoomIn,
   MdOutlineZoomOut,

@@ -6,6 +6,27 @@ import { CONVERSATION_API_ENDPOINTS } from "./api-endpoints";
 
 import { CreateConversationPayload } from "./types";
 
+export async function getConversation(id: string) {
+  try {
+    return await axiosInstance.get(
+      CONVERSATION_API_ENDPOINTS.CONVERSATION + "/" + id
+    );
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(
+        "Axios error occurred:",
+        error.response?.data || error.message
+      );
+      throw new Error(
+        error.response?.data?.message || "Failed to get the conversation"
+      );
+    } else {
+      console.error("Unexpected error occurred:", error);
+      throw new Error("An unexpected error occurred");
+    }
+  }
+}
+
 export async function createNewConversation(
   payload: CreateConversationPayload
 ): Promise<void> {

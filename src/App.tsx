@@ -33,11 +33,9 @@ export function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      {
-        <Suspense fallback={<SplashScreen />}>
-          <RouterProvider router={router} />
-        </Suspense>
-      }
+      <Suspense fallback={<SplashScreen />}>
+        <RouterProvider router={router} />
+      </Suspense>
       <Toaster />
     </ThemeProvider>
   );

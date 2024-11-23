@@ -3,7 +3,12 @@ export type ConversationType = {
   name: string;
   owner: string;
   members: string[];
-  participants: string[];
+  participants: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    photoURL: string;
+  }[];
   pdfFileURL: string;
   isPublic: boolean;
   isArchived: boolean;

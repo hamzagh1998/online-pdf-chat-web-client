@@ -1,18 +1,32 @@
 import {
   useMutation,
   UseMutationResult,
-  useQueryClient,
+  useQuery,
+  UseQueryResult,
 } from "@tanstack/react-query";
 
-import { useUserStore } from "@/hooks/store/use-user-store";
-
-import { createNewConversation } from "./api";
+import { createNewConversation, getConversation } from "./api";
 
 import { CreateConversationPayload } from "./types";
 
-import { getUserData } from "../auth/api";
-
-import { User } from "../auth/types";
+export function useGetConversation(id?: string): UseQueryResult<any, Error> {
+  return useQuery({
+    queryKey: ["getConversation", id],
+    queryFn: async ({ queryKey }) => {
+      const [, conversationId] = queryKey;
+      if (!conversationId) {
+        throw new Error("Conversation ID is required");
+      }
+      try {
+        return await getConversation(conversationId);
+      } catch (error) {
+        console.error(error);
+        throw error;
+      }
+    },
+    enabled: !!id,
+  });
+}
 
 export function useCreateConversation(): UseMutationResult<
   void,
@@ -20,8 +34,6 @@ export function useCreateConversation(): UseMutationResult<
   CreateConversationPayload,
   unknown
 > {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationKey: ["createConversation"],
     mutationFn: async (payload: CreateConversationPayload) => {
