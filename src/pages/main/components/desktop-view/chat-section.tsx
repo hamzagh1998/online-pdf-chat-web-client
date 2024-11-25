@@ -13,12 +13,12 @@ import { useGetConversation } from "@/services/conversation/queries";
 
 import { CustomTooltip } from "@/components/custom-tooltip";
 import { useToast } from "@/components/ui/use-toast";
+import { Separator } from "@/components/ui/separator";
+import { ParticipantPopOver } from "@/components/participant-pop-over";
+import { ShareDialog } from "@/components/share-dialog";
 
 import { MessageType } from "../../types";
 import { capitalizer, cn, convertUTCToLocal } from "@/lib/utils";
-import { Separator } from "@/components/ui/separator";
-import { Button } from "@/components/ui/button";
-import { ParticipantPopOver } from "@/components/participant-pop-over";
 
 function formatMessageContent(content: string): React.ReactNode {
   // Regular Expression to detect patterns like "* **Title:**", "**Title:**", etc.
@@ -216,11 +216,13 @@ export function ChatSection() {
               </ParticipantPopOver>
             )
         )}
-        <CustomTooltip text="Share conversation">
-          <button>
-            <FaShareAlt size={24} />
-          </button>
-        </CustomTooltip>
+        <ShareDialog>
+          <CustomTooltip text="Share conversation">
+            <button>
+              <FaShareAlt size={24} />
+            </button>
+          </CustomTooltip>
+        </ShareDialog>
       </nav>
       <div className="w-full h-full overflow-y-scroll p-4">
         {isPending ? (
