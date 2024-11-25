@@ -79,16 +79,16 @@ export function PdfReader({
 
   return (
     <section className="w-full h-full flex flex-col">
-      <nav className="py-2 px-4 border-b border-b-gray-300 flex justify-between items-center">
+      <nav className="py-2 px-4 border-b h-12 border-b-gray-300 flex justify-between items-center">
         <button className="cursor-pointer w-fit" onClick={onCollapseSideBar}>
           <VscLayoutSidebarLeftOff size={24} />
         </button>
         <div className="w-fit flex justify-center items-center gap-4">
           <button onClick={() => setZoom(zoom + 50)}>
-            <MdOutlineZoomIn size={24} />
+            <MdOutlineZoomIn size={28} />
           </button>
           <button onClick={() => setZoom(zoom - 50)}>
-            <MdOutlineZoomOut size={24} />
+            <MdOutlineZoomOut size={28} />
           </button>
         </div>
         <div className="flex justify-center items-center gap-2">
@@ -101,7 +101,7 @@ export function PdfReader({
                 : setCurrentPage(1)
             }
           >
-            <GrFormPrevious size={24} />
+            <GrFormPrevious size={36} />
           </button>
           <Input
             type="number"
@@ -123,7 +123,7 @@ export function PdfReader({
                 : setCurrentPage(totalPages)
             }
           >
-            <GrFormNext size={24} />
+            <GrFormNext size={36} />
           </button>
         </div>
         <button

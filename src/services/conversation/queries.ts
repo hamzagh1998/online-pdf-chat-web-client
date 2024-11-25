@@ -5,7 +5,11 @@ import {
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import { createNewConversation, getConversation } from "./api";
+import {
+  createNewConversation,
+  getConversation,
+  removeConversation,
+} from "./api";
 
 import { CreateConversationPayload } from "./types";
 
@@ -39,6 +43,25 @@ export function useCreateConversation(): UseMutationResult<
     mutationFn: async (payload: CreateConversationPayload) => {
       try {
         await createNewConversation(payload);
+      } catch (error) {
+        console.error("Mutation error:", error);
+        throw error;
+      }
+    },
+  });
+}
+
+export function useRemoveUserFromConversation(): UseMutationResult<
+  void,
+  Error,
+  { conversationId: string; userId: string },
+  unknown
+> {
+  return useMutation({
+    mutationKey: ["removeUserFromConversation"],
+    mutationFn: async ({ conversationId, userId }) => {
+      try {
+        await removeConversation(conversationId, userId);
       } catch (error) {
         console.error("Mutation error:", error);
         throw error;

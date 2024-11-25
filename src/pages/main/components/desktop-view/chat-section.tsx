@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { IoSend } from "react-icons/io5";
-import { FaLock, FaShareAlt } from "react-icons/fa";
+import { FaShareAlt } from "react-icons/fa";
+import { FiLoader } from "react-icons/fi";
 
 import { getAuth } from "firebase/auth";
 
@@ -16,7 +17,8 @@ import { useToast } from "@/components/ui/use-toast";
 import { MessageType } from "../../types";
 import { capitalizer, cn, convertUTCToLocal } from "@/lib/utils";
 import { Separator } from "@/components/ui/separator";
-import { FiLoader } from "react-icons/fi";
+import { Button } from "@/components/ui/button";
+import { ParticipantPopOver } from "@/components/participant-pop-over";
 
 function formatMessageContent(content: string): React.ReactNode {
   // Regular Expression to detect patterns like "* **Title:**", "**Title:**", etc.
@@ -189,20 +191,36 @@ export function ChatSection() {
 
   return (
     <section className="w-full h-full flex flex-col">
-      <nav className="py-3 px-4 border-b border-b-gray-300 flex justify-end items-center">
-        {currentConversation?.isPublic ? (
-          <CustomTooltip text="Stop sharing">
-            <button>
-              <FaLock size={24} />
-            </button>
-          </CustomTooltip>
-        ) : (
-          <CustomTooltip text="Share conversation">
-            <button>
-              <FaShareAlt size={24} />
-            </button>
-          </CustomTooltip>
+      <nav className="py-3 px-4 border-b h-12 border-b-gray-300 flex justify-end items-center gap-2">
+        {data?.data?.participants.map(
+          (participant: any) =>
+            participant._id !== userData?.id && (
+              <ParticipantPopOver
+                userId={participant._id}
+                conversationId={currentConversation!._id}
+                firstName={participant.firstName}
+                lastName={participant.lastName}
+                photoURL={participant.photoURL}
+              >
+                <div className="rounded-full w-7 h-7 cursor-pointer">
+                  <CustomTooltip
+                    text={participant.firstName + " " + participant.lastName}
+                  >
+                    <img
+                      src={participant.photoURL}
+                      alt="AV"
+                      className="rounded-full"
+                    />
+                  </CustomTooltip>
+                </div>
+              </ParticipantPopOver>
+            )
         )}
+        <CustomTooltip text="Share conversation">
+          <button>
+            <FaShareAlt size={24} />
+          </button>
+        </CustomTooltip>
       </nav>
       <div className="w-full h-full overflow-y-scroll p-4">
         {isPending ? (
@@ -251,9 +269,9 @@ export function ChatSection() {
                       {capitalizer(
                         message.isAiResponse
                           ? "AI"
-                          : message.sender.firstName +
+                          : (message.sender.firstName || "removed") +
                               " " +
-                              message.sender.lastName +
+                              (message.sender.lastName || "user") +
                               " - " +
                               convertUTCToLocal(message.timestamp)
                       )}

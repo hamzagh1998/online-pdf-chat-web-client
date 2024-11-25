@@ -129,7 +129,7 @@ export function SideBar() {
     if (isShared) {
       conversations =
         conversations.filter(
-          (conversation) => conversation.isPublic === isShared
+          (conversation) => conversation.participants.length > 1
         ) || [];
     }
     setFiltredConversations(conversations);
