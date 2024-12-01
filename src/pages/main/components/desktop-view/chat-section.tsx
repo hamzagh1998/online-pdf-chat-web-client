@@ -94,7 +94,7 @@ export function ChatSection() {
         const socket = new WebSocket(
           (import.meta.env.MODE === "development"
             ? import.meta.env.VITE_REACT_APP_WS_BASE_DEV_URL
-            : import.meta.env.VITE_REACT_APP_WS_BASE_PRO_URL) +
+            : import.meta.env.VITE_REACT_APP_WS_BASE_PROD_URL) +
             "?token=" +
             encodeURIComponent(token) +
             "&conversationId=" +
