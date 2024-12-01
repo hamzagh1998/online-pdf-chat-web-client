@@ -94,7 +94,7 @@ export function ChatSection() {
         const socket = new WebSocket(
           (import.meta.env.MODE === "development"
             ? import.meta.env.VITE_REACT_APP_WS_BASE_DEV_URL
-            : "wss://online-pdf-chat-web-server.onrender.com/conversation/messages") +
+            : import.meta.env.VITE_REACT_APP_WS_BASE_PROD_URL) +
             "?token=" +
             encodeURIComponent(token) +
             "&conversationId=" +
