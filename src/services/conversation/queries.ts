@@ -8,6 +8,7 @@ import {
 import {
   addUserToConversation,
   createNewConversation,
+  deleteConversation,
   getConversation,
   removeUserFromConversation,
 } from "./api";
@@ -82,6 +83,20 @@ export function useRemoveUserFromConversation(): UseMutationResult<
     mutationFn: async ({ conversationId, userId }) => {
       try {
         await removeUserFromConversation(conversationId, userId);
+      } catch (error) {
+        console.error("Mutation error:", error);
+        throw error;
+      }
+    },
+  });
+}
+
+export function useDeleteConversation() {
+  return useMutation({
+    mutationKey: ["deleteConversation"],
+    mutationFn: async (conversationId: string) => {
+      try {
+        await deleteConversation(conversationId);
       } catch (error) {
         console.error("Mutation error:", error);
         throw error;

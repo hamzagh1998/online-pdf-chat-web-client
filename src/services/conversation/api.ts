@@ -5,6 +5,7 @@ import { axiosInstance } from "../axios-instance";
 import { CONVERSATION_API_ENDPOINTS } from "./api-endpoints";
 
 import { CreateConversationPayload } from "./types";
+import exp from "constants";
 
 export async function getConversation(id: string) {
   try {
@@ -91,6 +92,30 @@ export async function removeUserFromConversation(
         conversationId +
         "&userId=" +
         userId
+    );
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(
+        "Axios error occurred:",
+        error.response?.data || error.message
+      );
+      throw new Error(
+        error.response?.data?.message ||
+          "Failed to remove user from the conversation"
+      );
+    } else {
+      console.error("Unexpected error occurred:", error);
+      throw new Error("An unexpected error occurred");
+    }
+  }
+}
+
+export async function deleteConversation(conversationId: string) {
+  try {
+    return await axiosInstance.delete(
+      CONVERSATION_API_ENDPOINTS.DELETE_CONVERSATION +
+        "?conversationId=" +
+        conversationId
     );
   } catch (error) {
     if (isAxiosError(error)) {

@@ -116,6 +116,14 @@ export function ChatSection() {
             toast({ description: data.content });
           }
 
+          if (data.type === "joining") {
+            queryClient
+              .invalidateQueries({
+                queryKey: ["getConversation", currentConversation?._id],
+              })
+              .then(() => toast({ description: data.content }));
+          }
+
           if (data.type === "messages") {
             queryClient
               .invalidateQueries({

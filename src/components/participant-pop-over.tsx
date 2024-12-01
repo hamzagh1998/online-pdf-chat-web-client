@@ -46,7 +46,7 @@ export function ParticipantPopOver({
         })
         .then(() =>
           toast({
-            description: `${firstName} been removed from the conversation!`,
+            description: `${firstName} has been removed from the conversation!`,
           })
         );
     } catch (error) {
@@ -61,7 +61,9 @@ export function ParticipantPopOver({
         <div className="w-full flex justify-start items-start gap-2">
           <img src={photoURL} className="w-9 h-9 rounded-full" alt="AV" />
           <div>
-            {capitalizer(firstName + " " + lastName)}
+            <p className="font-bold">
+              {capitalizer(firstName + " " + lastName)}
+            </p>
             <Badge
               className="text-xs"
               variant={userId === owner ? "default" : "outline"}
