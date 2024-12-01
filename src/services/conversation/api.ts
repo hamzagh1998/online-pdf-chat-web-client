@@ -5,7 +5,6 @@ import { axiosInstance } from "../axios-instance";
 import { CONVERSATION_API_ENDPOINTS } from "./api-endpoints";
 
 import { CreateConversationPayload } from "./types";
-import exp from "constants";
 
 export async function getConversation(id: string) {
   try {

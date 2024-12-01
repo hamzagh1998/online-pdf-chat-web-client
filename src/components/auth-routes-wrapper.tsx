@@ -1,12 +1,8 @@
-import { useEffect } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 
 import { useIsAuthenticated } from "@/hooks/use-is-authenticated";
-import { useUserStore } from "@/hooks/store/use-user-store";
 
 import { MAIN_PATHES } from "@/routes/main.routes";
-
-import { useAddUserToConversation } from "@/services/conversation/queries";
 
 import { SplashScreen } from "./splash-screen";
 
@@ -18,7 +14,6 @@ export function AuthRouteWrapper({ children }: AuthRouteProps) {
   const isAuthenticated = useIsAuthenticated();
 
   const location = useLocation();
-  const navigate = useNavigate();
 
   const searchParams = new URLSearchParams(location.search);
   const collaborate = searchParams.get("collaborate");

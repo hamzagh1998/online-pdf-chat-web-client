@@ -16,6 +16,7 @@ import { DeleteConfirmationDialog } from "@/components/delete-confirmation-dialo
 import { CustomTooltip } from "@/components/custom-tooltip";
 
 import { capitalizer, cn, convertUTCToLocal } from "@/lib/utils";
+import { deleteFileFromUrl } from "@/lib/firebase/storage/delete-file";
 
 type ConversationProps = {
   conversations: ConversationType[];
@@ -58,9 +59,10 @@ export function ConversationsList({
     }
   };
 
-  const onDeleteConversation = async (conversationId: string) => {
+  const onDeleteConversation = async (conversation: ConversationType) => {
     try {
-      await deleteConversation.mutateAsync(conversationId);
+      await deleteConversation.mutateAsync(conversation!._id);
+      deleteFileFromUrl(conversation!.pdfFileURL);
       queryClient
         .invalidateQueries({
           queryKey: ["userData"],
@@ -179,9 +181,7 @@ export function ConversationsList({
                       <DeleteConfirmationDialog
                         title="Deleting Conversation"
                         description="Are you absolutely sure you to delete this conversation, This action cannot be undone!"
-                        onConfirm={() =>
-                          onDeleteConversation(conversation!._id)
-                        }
+                        onConfirm={() => onDeleteConversation(conversation)}
                       >
                         <button>
                           <CustomTooltip text="Delete Conversation">
