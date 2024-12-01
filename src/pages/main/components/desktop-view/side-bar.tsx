@@ -57,12 +57,19 @@ export function SideBar() {
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files[0]) {
+      const file = files[0];
+
+      // Check if the file is a PDF
+      if (file.type !== "application/pdf") {
+        return alert("The selected file is not a PDF.");
+      }
+
       setValue("file", files);
       trigger("file");
 
       // Save the pdf file to the storage bucket
       const fileData = await onAddFile(
-        files[0],
+        file,
         30 * 1024 * 1024, // In MB
         userData?.email || "",
         "add"
@@ -114,7 +121,7 @@ export function SideBar() {
     if (!filtredConversations.length || !convId) return;
 
     const conversation: ConversationType = userData?.conversations.find(
-      (conv) => conv._id === convId
+      (conv) => conv!._id === convId
     )!;
     setConversationData(conversation);
   }, [filtredConversations]);
@@ -124,12 +131,12 @@ export function SideBar() {
     if (!userData?.conversations.length) return;
     let conversations =
       userData?.conversations.filter((conversation) =>
-        conversation.name.toLowerCase().includes(search.toLowerCase())
+        conversation!.name.toLowerCase().includes(search.toLowerCase())
       ) || [];
     if (isShared) {
       conversations =
         conversations.filter(
-          (conversation) => conversation.participants.length > 1
+          (conversation) => conversation!.participants.length > 1
         ) || [];
     }
     setFiltredConversations(conversations);

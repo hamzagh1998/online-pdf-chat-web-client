@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useConversationStore } from "@/hooks/store/use-conversation-store";
+import { FaCopy } from "react-icons/fa";
+import { FaUserGroup } from "react-icons/fa6";
 
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -10,9 +13,17 @@ import {
 } from "./ui/dialog";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
+import { toast } from "./ui/use-toast";
 
 export function ShareDialog({ children }: { children: React.ReactNode }) {
-  const [value, setValue] = useState("");
+  const { currentConversation } = useConversationStore();
+
+  const onCopy = () => {
+    navigator.clipboard.writeText(
+      window.location.host + "?collaborate=" + currentConversation?._id
+    );
+    toast({ description: "Link copied to clipboard!" });
+  };
 
   return (
     <Dialog>
@@ -21,19 +32,31 @@ export function ShareDialog({ children }: { children: React.ReactNode }) {
       </DialogTrigger>
       <DialogContent className="lg:w-[480px] w-full">
         <DialogHeader>
-          <DialogTitle>Add Participants</DialogTitle>
+          <DialogTitle className="w-fit flex justify-start items-center gap-1">
+            <FaUserGroup />
+            Collaboration
+          </DialogTitle>
           <DialogDescription>
-            Add new participants to this conversation
+            Copy send this link to your friends to start collaborating
           </DialogDescription>
         </DialogHeader>
         <div className="w-full space-y-2">
-          <Input
-            type="text"
-            value={value}
-            onChange={(e) => setValue(e.target.value)}
-          />
-          <div></div>
-          <Button className="w-full font-bold">+&ensp;Add</Button>
+          <div className="w-full h-12 flex justify-between gap-2 items-center p-2">
+            <Input
+              value={
+                window.location.host +
+                "?collaborate=" +
+                currentConversation?._id
+              }
+              readOnly
+            />
+            <DialogClose>
+              <Button variant="outline" onClick={onCopy}>
+                <FaCopy />
+                &ensp;Copy Link
+              </Button>
+            </DialogClose>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

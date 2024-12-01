@@ -6,9 +6,10 @@ import {
 } from "@tanstack/react-query";
 
 import {
+  addUserToConversation,
   createNewConversation,
   getConversation,
-  removeConversation,
+  removeUserFromConversation,
 } from "./api";
 
 import { CreateConversationPayload } from "./types";
@@ -51,6 +52,25 @@ export function useCreateConversation(): UseMutationResult<
   });
 }
 
+export function useAddUserToConversation(): UseMutationResult<
+  void,
+  Error,
+  { conversationId: string; userId: string },
+  unknown
+> {
+  return useMutation({
+    mutationKey: ["addUserToConversation"],
+    mutationFn: async ({ conversationId, userId }) => {
+      try {
+        await addUserToConversation(conversationId, userId);
+      } catch (error) {
+        console.error("Mutation error:", error);
+        throw error;
+      }
+    },
+  });
+}
+
 export function useRemoveUserFromConversation(): UseMutationResult<
   void,
   Error,
@@ -61,7 +81,7 @@ export function useRemoveUserFromConversation(): UseMutationResult<
     mutationKey: ["removeUserFromConversation"],
     mutationFn: async ({ conversationId, userId }) => {
       try {
-        await removeConversation(conversationId, userId);
+        await removeUserFromConversation(conversationId, userId);
       } catch (error) {
         console.error("Mutation error:", error);
         throw error;

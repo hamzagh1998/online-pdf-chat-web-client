@@ -13,4 +13,4 @@ export type ConversationType = {
   isPublic: boolean;
   isArchived: boolean;
   createdAt: Date;
-};
+} | null;

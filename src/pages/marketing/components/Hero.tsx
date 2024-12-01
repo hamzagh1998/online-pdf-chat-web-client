@@ -23,18 +23,11 @@ export const Hero = () => {
         </main>
 
         <p className="text-lg md:text-xl text-muted-foreground md:w-10/12 mx-auto lg:mx-0">
-          Easily interact with your PDF files. Using&ensp;
-          <a
-            href="https://docs.mistral.ai/"
-            className="text-foreground underline"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Mistral AI
-          </a>
-          &ensp; to quickly understand and extract valuable insights from your
-          documents. Ask questions, get summaries, and explore the content
-          without the hassle.
+          Effortlessly interact with your PDF files. Unlock valuable insights,
+          explore content, and get instant answers or summaries—all without the
+          hassle. Invite participants to the conversation, collaborate
+          seamlessly, and work together to uncover key information and make the
+          most of your documents.
         </p>
 
         <div className="space-y-4 md:space-y-0 md:space-x-4">

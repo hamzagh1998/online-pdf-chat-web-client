@@ -51,7 +51,36 @@ export async function createNewConversation(
   }
 }
 
-export async function removeConversation(
+export async function addUserToConversation(
+  conversationId: string,
+  userId: string
+) {
+  try {
+    return await axiosInstance.patch(
+      CONVERSATION_API_ENDPOINTS.ADD_USER_TO_CONVERSATION +
+        "?conversationId=" +
+        conversationId +
+        "&userId=" +
+        userId
+    );
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error(
+        "Axios error occurred:",
+        error.response?.data || error.message
+      );
+      throw new Error(
+        error.response?.data?.message ||
+          "Failed to add user to the conversation"
+      );
+    } else {
+      console.error("Unexpected error occurred:", error);
+      throw new Error("An unexpected error occurred");
+    }
+  }
+}
+
+export async function removeUserFromConversation(
   conversationId: string,
   userId: string
 ) {

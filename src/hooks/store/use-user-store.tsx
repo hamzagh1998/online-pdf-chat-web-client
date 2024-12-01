@@ -13,7 +13,7 @@ export type UserDataType = {
   plan: string;
   createdAt: Date;
   updatedAt: Date | null;
-};
+} | null;
 
 type UserState = {
   userData?: UserDataType;

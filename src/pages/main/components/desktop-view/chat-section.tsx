@@ -17,8 +17,9 @@ import { Separator } from "@/components/ui/separator";
 import { ParticipantPopOver } from "@/components/participant-pop-over";
 import { ShareDialog } from "@/components/share-dialog";
 
-import { MessageType } from "../../types";
 import { capitalizer, cn, convertUTCToLocal } from "@/lib/utils";
+
+import { MessageType } from "../../types";
 
 function formatMessageContent(content: string): React.ReactNode {
   // Regular Expression to detect patterns like "* **Title:**", "**Title:**", etc.
@@ -70,8 +71,8 @@ export function ChatSection() {
 
   const { toast } = useToast();
 
-  const { currentConversation } = useConversationStore();
   const { userData } = useUserStore();
+  const { currentConversation } = useConversationStore();
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -198,6 +199,7 @@ export function ChatSection() {
               <ParticipantPopOver
                 userId={participant._id}
                 conversationId={currentConversation!._id}
+                owner={currentConversation!.owner}
                 firstName={participant.firstName}
                 lastName={participant.lastName}
                 photoURL={participant.photoURL}
@@ -216,21 +218,23 @@ export function ChatSection() {
               </ParticipantPopOver>
             )
         )}
-        <ShareDialog>
-          <CustomTooltip text="Share conversation">
-            <button>
-              <FaShareAlt size={24} />
-            </button>
-          </CustomTooltip>
-        </ShareDialog>
+        {userData?.id === currentConversation?.owner && (
+          <ShareDialog>
+            <CustomTooltip text="Share conversation">
+              <button>
+                <FaShareAlt size={24} />
+              </button>
+            </CustomTooltip>
+          </ShareDialog>
+        )}
       </nav>
       <div className="w-full h-full overflow-y-scroll p-4">
-        {isPending ? (
+        {isPending && currentConversation?._id ? (
           <p className="text-lg text-center w-full mt-auto text-muted-foreground">
             Loading conversation...
           </p>
         ) : (
-          data.data.messages.map((message: MessageType) => (
+          data?.data?.messages?.map((message: MessageType) => (
             <div
               key={message._id}
               className={cn(

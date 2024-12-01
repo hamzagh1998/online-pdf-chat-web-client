@@ -26,6 +26,9 @@ import {
 import { useSignupUser } from "@/services/auth/queries";
 
 export function SigninForm() {
+  const queryParams = new URLSearchParams(window.location.search);
+  const collaborate = queryParams.get("collaborate");
+
   const {
     isPending,
     error,
@@ -150,7 +153,13 @@ export function SigninForm() {
       </CardContent>
       <CardFooter className="text-sm">
         Don&apos;t have an account?&ensp;
-        <Link to={AUTH_PATHES.SIGNUP} className="underline">
+        <Link
+          to={
+            AUTH_PATHES.SIGNUP +
+            (collaborate ? "?collaborate=" + collaborate : "")
+          }
+          className="underline"
+        >
           Sign up
         </Link>
       </CardFooter>

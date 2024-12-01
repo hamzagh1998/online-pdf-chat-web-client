@@ -1,7 +1,8 @@
 import { RiDatabase2Line } from "react-icons/ri";
-import { FaBell } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 import { useUserStore } from "@/hooks/store/use-user-store";
+import { useConversationStore } from "@/hooks/store/use-conversation-store";
 
 import { auth } from "@/lib/firebase/firebase.config";
 
@@ -20,13 +21,15 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { capitalizer } from "@/lib/utils";
-import { Link } from "react-router-dom";
 
 export function HeadView() {
-  const { userData } = useUserStore();
+  const { userData, setUserData } = useUserStore();
+  const { setConversationData } = useConversationStore();
 
   const onSignout = () => {
     localStorage.clear();
+    setUserData(null);
+    setConversationData(null);
     auth.signOut();
   };
 
@@ -59,11 +62,14 @@ export function HeadView() {
             </DropdownMenuLabel>
             <DropdownMenuLabel>
               <DropdownMenuShortcut className="mb-2 flex justify-end items-center gap-2">
-                <RiDatabase2Line size={20} />{" "}
+                <RiDatabase2Line size={20} />
+                &ensp;
                 {(userData?.storageUsageInMb || 0).toFixed(2)}
-                /200MB
+                /80MB
               </DropdownMenuShortcut>
-              <Progress value={userData?.storageUsageInMb || 0} />
+              <Progress
+                value={((userData?.storageUsageInMb || 0) * 100) / 80}
+              />
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
@@ -80,9 +86,6 @@ export function HeadView() {
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
-        <button className="cursor-pointer hover:bg-secondary p-2 rounded-md">
-          <FaBell size={20} />
-        </button>
         <ModeToggle />
       </section>
     </nav>
