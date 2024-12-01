@@ -5,7 +5,10 @@ import { FaTrashAlt } from "react-icons/fa";
 
 import { useUserStore } from "@/hooks/store/use-user-store";
 
-import { useRemoveUserFromConversation } from "@/services/conversation/queries";
+import {
+  useDeleteConversation,
+  useRemoveUserFromConversation,
+} from "@/services/conversation/queries";
 
 import { toast } from "@/components/ui/use-toast";
 import { ConversationType } from "@/hooks/store/common-types";
@@ -33,6 +36,8 @@ export function ConversationsList({
 
   const removeUserFromConversation = useRemoveUserFromConversation();
 
+  const deleteConversation = useDeleteConversation();
+
   const onRemoveUserFromConversation = async (conversationId: string) => {
     try {
       await removeUserFromConversation.mutateAsync({
@@ -46,6 +51,23 @@ export function ConversationsList({
         .then(() =>
           toast({
             description: `You have been removed from the conversation!`,
+          })
+        );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const onDeleteConversation = async (conversationId: string) => {
+    try {
+      await deleteConversation.mutateAsync(conversationId);
+      queryClient
+        .invalidateQueries({
+          queryKey: ["userData"],
+        })
+        .then(() =>
+          toast({
+            description: `Conversation has been deleted!`,
           })
         );
     } catch (error) {
@@ -157,7 +179,9 @@ export function ConversationsList({
                       <DeleteConfirmationDialog
                         title="Deleting Conversation"
                         description="Are you absolutely sure you to delete this conversation, This action cannot be undone!"
-                        onConfirm={() => console.log("Deleted")}
+                        onConfirm={() =>
+                          onDeleteConversation(conversation!._id)
+                        }
                       >
                         <button>
                           <CustomTooltip text="Delete Conversation">
