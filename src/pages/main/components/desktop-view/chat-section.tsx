@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { IoSend } from "react-icons/io5";
-import { FaChevronUp, FaShareAlt } from "react-icons/fa";
+import { FaShareAlt } from "react-icons/fa";
 import { FiLoader } from "react-icons/fi";
 
 import { getAuth } from "firebase/auth";
@@ -199,11 +199,11 @@ export function ChatSection() {
     }
   }, [data]);
 
-  const onGoUp = () => {
-    if (messagesStartRef.current) {
-      messagesStartRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  };
+  // const onGoUp = () => {
+  //   if (messagesStartRef.current) {
+  //     messagesStartRef.current.scrollIntoView({ behavior: "smooth" });
+  //   }
+  // };
 
   return (
     <section className="w-full h-full flex flex-col">
