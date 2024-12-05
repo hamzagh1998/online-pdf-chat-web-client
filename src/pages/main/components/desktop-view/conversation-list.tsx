@@ -164,10 +164,9 @@ export function ConversationsList({
                         currentConversation?._id === conversation!._id,
                     }
                   )}
-                  onClick={() => onUpdateConversation(conversation)}
                 >
                   {/* Main Content */}
-                  <div>
+                  <div onClick={() => onUpdateConversation(conversation)}>
                     <CustomTooltip text={conversation!.name}>
                       <p className="w-fit text-sm max-w-full line-clamp-1 hover:cursor-pointer hover:underline">
                         {conversation!.name}
