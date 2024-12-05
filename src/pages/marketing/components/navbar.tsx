@@ -26,7 +26,7 @@ export const Navbar = () => {
             <a
               rel="noreferrer noopener"
               href="/"
-              className="ml-2 font-bold text-2xl flex gap-2 items-start justify-center text-primary"
+              className="ml-2 font-bold text-xl xl:text-2xl flex gap-2 items-start justify-center text-primary"
             >
               <LogoIcon />
               OnlinePDFChat

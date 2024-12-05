@@ -24,7 +24,11 @@ import { useCreateConversation } from "@/services/conversation/queries";
 
 import { ConversationsList } from "./conversation-list";
 
-export function SideBar() {
+export function SideBar({
+  setIsSidebarOpen,
+}: {
+  setIsSidebarOpen?: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const { userData, setUserData } = useUserStore();
   const { currentConversation, setConversationData } = useConversationStore();
 
@@ -213,6 +217,7 @@ export function SideBar() {
           conversations={filtredConversations}
           currentConversation={currentConversation}
           setConversationData={setConversationData}
+          setIsSidebarOpen={setIsSidebarOpen}
         />
       ) : null}
       <div

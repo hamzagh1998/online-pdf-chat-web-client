@@ -22,12 +22,14 @@ type ConversationProps = {
   conversations: ConversationType[];
   currentConversation?: ConversationType;
   setConversationData: (conversation: ConversationType) => void;
+  setIsSidebarOpen?: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export function ConversationsList({
   conversations,
   currentConversation,
   setConversationData,
+  setIsSidebarOpen,
 }: ConversationProps) {
   const currentConversationRef = useRef<HTMLDivElement>(null);
 
@@ -90,6 +92,7 @@ export function ConversationsList({
   const onUpdateConversation = (conversation: ConversationType) => {
     setConversationData(conversation);
     localStorage.setItem("convId", JSON.stringify(conversation!._id));
+    setIsSidebarOpen && setIsSidebarOpen(false);
   };
 
   const organizeConversations = (conversations: ConversationType[]) => {

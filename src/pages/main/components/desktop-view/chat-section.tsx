@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { IoSend } from "react-icons/io5";
-import { FaShareAlt } from "react-icons/fa";
+import { FaChevronUp, FaShareAlt } from "react-icons/fa";
 import { FiLoader } from "react-icons/fi";
 
 import { getAuth } from "firebase/auth";
@@ -74,6 +74,7 @@ export function ChatSection() {
   const { userData } = useUserStore();
   const { currentConversation } = useConversationStore();
 
+  const messagesStartRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [question, setQuestion] = useState<string>("");
@@ -198,8 +199,15 @@ export function ChatSection() {
     }
   }, [data]);
 
+  const onGoUp = () => {
+    if (messagesStartRef.current) {
+      messagesStartRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="w-full h-full flex flex-col">
+      <div ref={messagesStartRef} />
       <nav className="py-3 px-4 border-b h-12 border-b-gray-300 flex justify-end items-center gap-2">
         {data?.data?.participants.map(
           (participant: any) =>
@@ -343,6 +351,12 @@ export function ChatSection() {
           </div>
         )}
       </div>
+      {/* <div
+        className="xl:hidden sticky bottom-24 right-6 p-3 rounded-full w-fit h-fit group-hover:flex justify-center items-center cursor-pointer left-96 bg-secondary hover:opacity-80"
+        onClick={onGoUp}
+      >
+        <FaChevronUp size={16} />
+      </div> */}
     </section>
   );
 }

@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 export function PdfReader({
   setIsCollapsed,
 }: {
-  setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsCollapsed?: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const { currentConversation } = useConversationStore();
 
@@ -30,7 +30,7 @@ export function PdfReader({
     const isCollapsed = JSON.parse(localStorage.getItem("isCollapsed")!);
     localStorage.setItem("isCollapsed", JSON.stringify(!isCollapsed));
 
-    setIsCollapsed(!isCollapsed);
+    setIsCollapsed && setIsCollapsed(!isCollapsed);
   };
 
   const onChangePage = (value: string) => {
@@ -80,9 +80,11 @@ export function PdfReader({
   return (
     <section className="w-full h-full flex flex-col">
       <nav className="py-2 px-4 border-b h-12 border-b-gray-300 flex justify-between items-center">
-        <button className="cursor-pointer w-fit" onClick={onCollapseSideBar}>
-          <VscLayoutSidebarLeftOff size={24} />
-        </button>
+        {setIsCollapsed && (
+          <button className="cursor-pointer w-fit" onClick={onCollapseSideBar}>
+            <VscLayoutSidebarLeftOff size={24} />
+          </button>
+        )}
         <div className="w-fit flex justify-center items-center gap-4">
           <button onClick={() => setZoom(zoom + 50)}>
             <MdOutlineZoomIn size={28} />
@@ -126,15 +128,17 @@ export function PdfReader({
             <GrFormNext size={36} />
           </button>
         </div>
-        <button
-          className="disabled:cursor-not-allowed disabled:text-muted"
-          disabled={!currentConversation?.pdfFileURL}
-          onClick={() =>
-            currentConversation?.pdfFileURL ? setIsFullscreen(true) : null
-          }
-        >
-          <MdZoomOutMap size={24} />
-        </button>
+        {setIsCollapsed && (
+          <button
+            className="disabled:cursor-not-allowed disabled:text-muted"
+            disabled={!currentConversation?.pdfFileURL}
+            onClick={() =>
+              currentConversation?.pdfFileURL ? setIsFullscreen(true) : null
+            }
+          >
+            <MdZoomOutMap size={24} />
+          </button>
+        )}
         <button
           className="disabled:cursor-not-allowed disabled:text-muted"
           disabled={!currentConversation?.pdfFileURL}
