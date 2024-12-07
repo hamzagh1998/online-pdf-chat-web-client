@@ -72,6 +72,13 @@ export function SideBar({
       trigger("file");
 
       // Save the pdf file to the storage bucket
+      if (
+        file.size + (userData?.storageUsageInMb || 0) * 1024 * 1024 >
+        80 * 1024 * 1024
+      ) {
+        return alert("You have reached the storage limit of 80MB.");
+      }
+
       const fileData = await onAddFile(
         file,
         30 * 1024 * 1024, // In MB
