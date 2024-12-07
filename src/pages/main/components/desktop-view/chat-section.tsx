@@ -134,8 +134,10 @@ export function ChatSection() {
           if (data.message) {
             toast({ description: data.message });
           }
-          setOnlineUsers(data.onlineUsers);
 
+          if (data.onlineUsers) {
+            setOnlineUsers(data.onlineUsers);
+          }
           if (data.type === "notification") {
             setOnlineUsers(data.onlineUsers);
             toast({ description: data.content });
@@ -389,7 +391,7 @@ export function ChatSection() {
         <div className="w-full flex items-center gap-2 border-2 border-secondary rounded-xl px-4 py-2 relative">
           <textarea
             ref={textareaRef}
-            className="w-full min-h-[48px] max-h-[160px] overflow-y-auto border-none border-0 bg-transparent"
+            className="w-full min-h-[38px] max-h-[160px] overflow-y-auto border-none border-0 bg-transparent focus:outline-none"
             value={question}
             onChange={(e) => !isAiLoading && setQuestion(e.target.value)}
             onKeyDown={!isAiLoading ? handleKeyDown : () => null}
