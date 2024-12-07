@@ -7,12 +7,11 @@ import { TabContainer } from "./components/mobile-view/tab-container";
 export function MainPage() {
   const isTablet = useMediaQuery("(min-width: 768px) and (max-width: 1024px)");
   const isPhone = useMediaQuery("(max-width: 767px)");
+  const isMobile = isTablet || isPhone;
 
   return (
     <main className="w-full h-screen flex flex-col overflow-x-hidden">
-      {isTablet ? (
-        <TabContainer />
-      ) : isPhone ? (
+      {isMobile ? (
         <TabContainer />
       ) : (
         <>

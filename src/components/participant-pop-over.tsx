@@ -1,17 +1,23 @@
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
-import { Button } from "./ui/button";
-import { useRemoveUserFromConversation } from "@/services/conversation/queries";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "./ui/use-toast";
+import { HiUserRemove } from "react-icons/hi";
+
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+
+import { useRemoveUserFromConversation } from "@/services/conversation/queries";
+
 import { useUserStore } from "@/hooks/store/use-user-store";
+
+import { Button } from "./ui/button";
+import { toast } from "./ui/use-toast";
 import { Badge } from "./ui/badge";
 import { PopoverClose } from "@radix-ui/react-popover";
 
-import { capitalizer } from "@/lib/utils";
+import { capitalizer, cn } from "@/lib/utils";
 
 type ParticipantPopOverProps = {
   userId: string;
   conversationId: string;
+  isOnline: boolean;
   owner: string;
   firstName: string;
   lastName: string;
@@ -22,6 +28,7 @@ type ParticipantPopOverProps = {
 export function ParticipantPopOver({
   userId,
   conversationId,
+  isOnline,
   owner,
   firstName,
   lastName,
@@ -57,12 +64,21 @@ export function ParticipantPopOver({
   return (
     <Popover>
       <PopoverTrigger asChild>{children}</PopoverTrigger>
-      <PopoverContent className="xl:w-52 rounded-lg p-4 w-full bg-secondary space-y-4">
+      <PopoverContent className="xl:w-52 flex justify-center items-center flex-col rounded-lg p-4 w-full bg-secondary space-y-4">
         <div className="w-full flex justify-start items-start gap-2">
           <img src={photoURL} className="w-9 h-9 rounded-full" alt="AV" />
           <div>
             <p className="font-bold">
               {capitalizer(firstName + " " + lastName)}
+            </p>
+            <p className="font-bold text-xs flex justify-start items-center gap-1">
+              <div
+                className={cn(
+                  "h-3 w-3 rounded-full",
+                  isOnline ? "bg-emerald-500" : "bg-gray-500"
+                )}
+              />
+              {isOnline ? "online" : "offline"}
             </p>
             <Badge
               className="text-xs"
@@ -83,7 +99,8 @@ export function ParticipantPopOver({
                 className="font-bold"
                 onClick={onRemoveUserFromConversation}
               >
-                Remove from conversation
+                <HiUserRemove size={16} />
+                &ensp; Remove from chat
               </Button>
             </PopoverClose>
           )

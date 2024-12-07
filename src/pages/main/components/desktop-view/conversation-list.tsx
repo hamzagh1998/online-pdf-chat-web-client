@@ -169,7 +169,9 @@ export function ConversationsList({
                   <div onClick={() => onUpdateConversation(conversation)}>
                     <CustomTooltip text={conversation!.name}>
                       <p className="w-fit text-sm max-w-full line-clamp-1 hover:cursor-pointer hover:underline">
-                        {conversation!.name}
+                        {conversation!.name.length > 15
+                          ? conversation!.name.substring(0, 15) + "..."
+                          : conversation!.name}
                       </p>
                     </CustomTooltip>
                     <p className="text-xs">

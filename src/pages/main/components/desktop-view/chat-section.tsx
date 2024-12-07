@@ -20,6 +20,7 @@ import { ShareDialog } from "@/components/share-dialog";
 import { capitalizer, cn, convertUTCToLocal } from "@/lib/utils";
 
 import { MessageType } from "../../types";
+import { CustomSelect } from "@/components/custom-select";
 
 function formatMessageContent(content: string): React.ReactNode {
   // Regular Expression to detect patterns like "* **Title:**", "**Title:**", etc.
@@ -74,17 +75,34 @@ export function ChatSection() {
   const { userData } = useUserStore();
   const { currentConversation } = useConversationStore();
 
-  const messagesStartRef = useRef<HTMLDivElement>(null);
+  const messageTo =
+    JSON.parse(localStorage.getItem("messageTo") as string) || "AI";
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const [question, setQuestion] = useState<string>("");
-  const [ws, setWs] = useState<WebSocket | null>(null);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [questionTo, setQuestionTo] = useState<"AI" | "CHAT">(messageTo);
   const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
   const [typingMsg, setTypingMsg] = useState<string | null>(null);
 
   const { data, isPending, error } = useGetConversation(
     currentConversation?._id
   );
+
+  const wsRef = useRef<WebSocket | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [question]);
+
+  useEffect(() => {
+    localStorage.setItem("messageTo", JSON.stringify(questionTo));
+  }, [questionTo]);
 
   const initializeWebSocket = async () => {
     try {
@@ -113,7 +131,13 @@ export function ChatSection() {
         socket.onmessage = (event) => {
           const data = JSON.parse(event.data);
 
+          if (data.message) {
+            toast({ description: data.message });
+          }
+          setOnlineUsers(data.onlineUsers);
+
           if (data.type === "notification") {
+            setOnlineUsers(data.onlineUsers);
             toast({ description: data.content });
           }
 
@@ -122,7 +146,10 @@ export function ChatSection() {
               .invalidateQueries({
                 queryKey: ["getConversation", currentConversation?._id],
               })
-              .then(() => toast({ description: data.content }));
+              .then(() => {
+                setOnlineUsers(data.onlineUsers);
+                toast({ description: data.content });
+              });
           }
 
           if (data.type === "messages") {
@@ -144,19 +171,38 @@ export function ChatSection() {
           toast({ description: "Connection closed" });
         };
 
-        setWs(socket);
+        wsRef.current = socket;
       }
     } catch (error) {
       console.error("Failed to initialize WebSocket:", error);
     }
   };
 
+  useEffect(() => {
+    if (!currentConversation?._id) return;
+    initializeWebSocket();
+
+    if (currentConversation?.participants.length === 1) {
+      setQuestionTo("AI");
+    }
+
+    return () => {
+      wsRef.current?.close();
+      setQuestion("");
+      setOnlineUsers([]);
+    };
+  }, [currentConversation?._id]);
+
   const onSendQuestion = () => {
-    if (ws && question) {
+    if (wsRef.current && question) {
       setIsAiLoading(true);
-      ws.send(
+      wsRef.current.send(
         JSON.stringify({
-          data: { message: question, userId: userData?.id },
+          data: {
+            message: question.trim(),
+            userId: userData?.id,
+            to: questionTo,
+          },
           type: "question",
         })
       );
@@ -164,9 +210,16 @@ export function ChatSection() {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      onSendQuestion();
+    }
+  };
+
   useEffect(() => {
-    if (!question.length || !ws || !userData) return;
-    ws.send(
+    if (!question.length || !wsRef.current || !userData) return;
+    wsRef.current.send(
       JSON.stringify({
         data: {
           message: capitalizer(userData.firstName) + " is typing...",
@@ -176,16 +229,6 @@ export function ChatSection() {
       })
     );
   }, [question]);
-
-  useEffect(() => {
-    if (!currentConversation?._id) return;
-
-    initializeWebSocket();
-
-    return () => {
-      ws?.close(); // Clean up on component unmount
-    };
-  }, [currentConversation?._id]);
 
   if (error) {
     toast({ description: error.message });
@@ -199,52 +242,69 @@ export function ChatSection() {
     }
   }, [data]);
 
-  // const onGoUp = () => {
-  //   if (messagesStartRef.current) {
-  //     messagesStartRef.current.scrollIntoView({ behavior: "smooth" });
-  //   }
-  // };
-
   return (
     <section className="w-full h-full flex flex-col">
-      <div ref={messagesStartRef} />
-      <nav className="py-3 px-4 border-b h-12 border-b-gray-300 flex justify-end items-center gap-2">
-        {data?.data?.participants.map(
-          (participant: any) =>
-            participant._id !== userData?.id && (
-              <ParticipantPopOver
-                userId={participant._id}
-                conversationId={currentConversation!._id}
-                owner={currentConversation!.owner}
-                firstName={participant.firstName}
-                lastName={participant.lastName}
-                photoURL={participant.photoURL}
-              >
-                <div className="rounded-full w-7 h-7 cursor-pointer">
-                  <CustomTooltip
-                    text={participant.firstName + " " + participant.lastName}
+      {/* Navigation Section */}
+      <nav className="sticky top-0 z-10 py-3 px-4 border-b h-12 border-b-gray-300 flex justify-between items-center">
+        <div>
+          {data?.data?.participants.length > 1 && (
+            <CustomSelect
+              options={["AI", "CHAT"]}
+              selectedLabel="Message to"
+              isCapitazed={false}
+              placeholder={questionTo}
+              setValue={(value) => setQuestionTo(value as "AI" | "CHAT")}
+            />
+          )}
+        </div>
+        <div className="flex justify-end items-center gap-2">
+          {data?.data?.participants.map(
+            (participant: any) =>
+              participant._id !== userData?.id && (
+                <ParticipantPopOver
+                  key={participant._id}
+                  userId={participant._id}
+                  isOnline={onlineUsers?.includes(participant.email)}
+                  conversationId={currentConversation!._id}
+                  owner={currentConversation!.owner}
+                  firstName={participant.firstName}
+                  lastName={participant.lastName}
+                  photoURL={participant.photoURL}
+                >
+                  <div
+                    className={cn(
+                      "rounded-full w-7 h-7 cursor-pointer",
+                      onlineUsers?.includes(participant.email) &&
+                        "border border-emerald-500"
+                    )}
                   >
-                    <img
-                      src={participant.photoURL}
-                      alt="AV"
-                      className="rounded-full"
-                    />
-                  </CustomTooltip>
-                </div>
-              </ParticipantPopOver>
-            )
-        )}
-        {userData?.id === currentConversation?.owner && (
-          <ShareDialog>
-            <CustomTooltip text="Share conversation">
-              <button>
-                <FaShareAlt size={24} />
-              </button>
-            </CustomTooltip>
-          </ShareDialog>
-        )}
+                    <CustomTooltip
+                      text={participant.firstName + " " + participant.lastName}
+                    >
+                      <img
+                        src={participant.photoURL}
+                        alt="AV"
+                        className="rounded-full"
+                      />
+                    </CustomTooltip>
+                  </div>
+                </ParticipantPopOver>
+              )
+          )}
+          {userData?.id === currentConversation?.owner && (
+            <ShareDialog>
+              <CustomTooltip text="Share conversation">
+                <button>
+                  <FaShareAlt size={24} />
+                </button>
+              </CustomTooltip>
+            </ShareDialog>
+          )}
+        </div>
       </nav>
-      <div className="w-full h-full overflow-y-scroll p-4">
+
+      {/* Messages Section */}
+      <div className="flex-grow w-full overflow-y-auto p-4">
         {isPending && currentConversation?._id ? (
           <p className="text-lg text-center w-full mt-auto text-muted-foreground">
             Loading conversation...
@@ -301,7 +361,7 @@ export function ChatSection() {
                   </div>
                   <p
                     className={cn(
-                      "w-fit rounded-xl p-2 bg-secondary",
+                      "w-fit rounded-xl p-2 bg-secondary break-words",
                       message.sender._id === userData?.id &&
                         !message.isAiResponse
                         ? "float-end bg-primary text-white"
@@ -320,43 +380,39 @@ export function ChatSection() {
         )}
         <div ref={messagesEndRef} />
       </div>
-      <div className="w-full h-16 px-4">
+
+      {/* Input Section */}
+      <div className="w-full px-4 py-2">
         <p className="w-full text-right text-xs text-muted-foreground">
           {typingMsg}
         </p>
-        {isAiLoading ? (
-          <div className="w-full flex justify-center items-center gap-2">
+        <div className="w-full flex items-center gap-2 border-2 border-secondary rounded-xl px-4 py-2 relative">
+          <textarea
+            ref={textareaRef}
+            className="w-full min-h-[48px] max-h-[160px] overflow-y-auto border-none border-0 bg-transparent"
+            value={question}
+            onChange={(e) => !isAiLoading && setQuestion(e.target.value)}
+            onKeyDown={!isAiLoading ? handleKeyDown : () => null}
+            placeholder={
+              questionTo === "AI" ? "Message AI..." : "Message Chat..."
+            }
+            rows={1}
+          />
+          {isAiLoading ? (
             <div className="animate-spin">
               <FiLoader size={24} />
             </div>
-            <p>Generating response...</p>
-          </div>
-        ) : (
-          <div className="w-full h-full flex justify-between items-center gap-2 rounded-xl px-4 border-2 border-secondary">
-            <input
-              type="text"
-              className="w-full h-full border-none border-0 outline-none bg-transparent"
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && onSendQuestion()}
-              placeholder="Ask your question"
-            />
+          ) : (
             <button
-              className="w-fit hover:text-primary disabled:text-muted disabled:cursor-not-allowed"
+              className="absolute right-4 hover:text-primary disabled:text-muted disabled:cursor-not-allowed"
               disabled={question.length === 0}
               onClick={onSendQuestion}
             >
               <IoSend size={26} />
             </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-      {/* <div
-        className="xl:hidden sticky bottom-24 right-6 p-3 rounded-full w-fit h-fit group-hover:flex justify-center items-center cursor-pointer left-96 bg-secondary hover:opacity-80"
-        onClick={onGoUp}
-      >
-        <FaChevronUp size={16} />
-      </div> */}
     </section>
   );
 }

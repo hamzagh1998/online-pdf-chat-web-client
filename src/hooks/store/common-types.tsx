@@ -5,6 +5,7 @@ export type ConversationType = {
   members: string[];
   participants: {
     _id: string;
+    email: string;
     firstName: string;
     lastName: string;
     photoURL: string;

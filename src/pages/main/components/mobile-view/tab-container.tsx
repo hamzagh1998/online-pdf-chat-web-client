@@ -10,7 +10,7 @@ import { ModeToggle } from "@/components/ui/mode-toggle";
 import { UserDropdown } from "@/components/user-dropdown";
 
 export function TabContainer() {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
