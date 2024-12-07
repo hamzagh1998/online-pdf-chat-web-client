@@ -251,6 +251,7 @@ export function ChatSection() {
         <div>
           {data?.data?.participants.length > 1 && (
             <CustomSelect
+              className="w-36"
               options={["AI", "CHAT"]}
               selectedLabel="Message to"
               isCapitazed={false}

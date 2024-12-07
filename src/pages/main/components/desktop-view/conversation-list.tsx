@@ -166,12 +166,13 @@ export function ConversationsList({
                   )}
                 >
                   {/* Main Content */}
-                  <div onClick={() => onUpdateConversation(conversation)}>
+                  <div
+                    className="w-10/12"
+                    onClick={() => onUpdateConversation(conversation)}
+                  >
                     <CustomTooltip text={conversation!.name}>
                       <p className="w-fit text-sm max-w-full line-clamp-1 hover:cursor-pointer hover:underline">
-                        {conversation!.name.length > 15
-                          ? conversation!.name.substring(0, 15) + "..."
-                          : conversation!.name}
+                        {conversation!.name}
                       </p>
                     </CustomTooltip>
                     <p className="text-xs">
@@ -180,7 +181,7 @@ export function ConversationsList({
                   </div>
 
                   {/* Actions Visible on Hover */}
-                  <div className="w-fit flex justify-center items-center gap-2">
+                  <div className="w-2/12 flex justify-center items-center gap-2">
                     {conversation?.owner === userData?.id ? (
                       <DeleteConfirmationDialog
                         title="Deleting Conversation"
