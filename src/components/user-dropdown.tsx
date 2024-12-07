@@ -54,9 +54,9 @@ export function UserDropdown() {
             <RiDatabase2Line size={20} />
             &ensp;
             {(userData?.storageUsageInMb || 0).toFixed(2)}
-            /80MB
+            /60MB
           </DropdownMenuShortcut>
-          <Progress value={((userData?.storageUsageInMb || 0) * 100) / 80} />
+          <Progress value={((userData?.storageUsageInMb || 0) * 100) / 60} />
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
