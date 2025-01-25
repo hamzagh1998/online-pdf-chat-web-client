@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
+
 import { PdfReader } from "./pdf-reader";
 import { ChatSection } from "./chat-section";
 import { SideBar } from "./side-bar";
-
-import { cn } from "@/lib/utils";
 
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+
+import { cn } from "@/lib/utils";
 
 export function ResizableWrapper() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -21,15 +22,12 @@ export function ResizableWrapper() {
 
   return (
     <section className="flex justify-start items-start w-full h-full">
-      <div
-        className={cn(
-          "w-2/12 h-full border-r border-secondary overflow-y-scroll",
-          isCollapsed && "w-0"
-        )}
-      >
-        <SideBar />
-      </div>
-      <div className={cn("w-10/12 h-full", isCollapsed && "w-full")}>
+      {!isCollapsed && (
+        <div className="w-2/12 h-full border-r border-secondary overflow-y-scroll">
+          <SideBar />
+        </div>
+      )}
+      <div className={cn("h-full", isCollapsed ? "w-full" : "w-10/12")}>
         <ResizablePanelGroup direction="horizontal">
           <ResizablePanel>
             <PdfReader setIsCollapsed={setIsCollapsed} />
