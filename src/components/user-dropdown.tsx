@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { useConversationStore } from "@/hooks/store/use-conversation-store";
 import { RiDatabase2Line } from "react-icons/ri";
 
@@ -21,6 +22,14 @@ import { Progress } from "./ui/progress";
 
 import { capitalizer } from "@/lib/utils";
 
+const MemoizedAvatarImage = memo(({ src }: { src: string }) => (
+  <AvatarImage
+    className="rounded-full h-9 w-h-9 cursor-pointer border-2 hover:border-primary"
+    src={src}
+    alt="Avatar"
+  />
+));
+
 export function UserDropdown() {
   const { userData, setUserData } = useUserStore();
   const { setConversationData } = useConversationStore();
@@ -35,11 +44,7 @@ export function UserDropdown() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar>
-          <AvatarImage
-            className="rounded-full h-9 w-h-9 cursor-pointer border-2 hover:border-primary"
-            src={userData?.photoURL || ""}
-            alt="Avatar"
-          />
+          <MemoizedAvatarImage src={userData?.photoURL || ""} />
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
