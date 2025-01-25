@@ -32,10 +32,7 @@ export function ResizableWrapper() {
           <ResizablePanel>
             <PdfReader setIsCollapsed={setIsCollapsed} />
           </ResizablePanel>
-          <ResizableHandle
-            className="transition-colors delay-150 hover:bg-primary"
-            withHandle
-          />
+          <ResizableHandle className="hover:bg-primary" withHandle />
           <ResizablePanel>
             <ChatSection />
           </ResizablePanel>
